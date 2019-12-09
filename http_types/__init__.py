@@ -107,3 +107,11 @@ class Response(_Response, total=True):
 
     """ Response status code."""
     status_code: int
+
+
+class RequestResponsePair(TypedDict, total=True):
+    """
+    HTTP request-response pair.
+    """
+    req: Request
+    res: Response
