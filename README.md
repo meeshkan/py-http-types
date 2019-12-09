@@ -1,6 +1,8 @@
 # HTTP types in Python
 
-Types for HTTP requests and responses, shared across projects.
+Types for HTTP request and response.
+
+Requires **Python >= 3.6**.
 
 ## Installation
 
@@ -12,6 +14,9 @@ pip install http-types
 
 ```bash
 from http_types import Request, Response
+
+req = Request(method='get', ...)
+
 # TODO
 ```
 

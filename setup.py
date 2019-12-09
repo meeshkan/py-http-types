@@ -17,7 +17,8 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 REQUIRED = [
-    'typing-extensions'
+    'typing-extensions',
+    'typeguard'
 ]
 
 DEV = [
