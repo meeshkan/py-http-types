@@ -99,6 +99,28 @@ class TestCommand(SetupCommand):
         sys.exit()
 
 
+class UploadCommand(SetupCommand):
+    """Support setup.py upload."""
+    description = "Build and publish the package."
+
+    def run(self):
+
+        self.status("Removing previous builds...")
+        self.rmdir_if_exists(os.path.join(here, 'dist'))
+
+        self.status("Building Source and Wheel (universal) distribution...")
+        build()
+
+        self.status("Uploading the package to PyPI via Twine...")
+        os.system("twine upload dist/*")
+
+        self.status("Pushing git tags...")
+        os.system("git tag v{about}".format(about=VERSION))
+        os.system("git push --tags")
+
+        sys.exit()
+
+
 setup(name=NAME,
       version=VERSION,
       description=DESCRIPTION,
@@ -120,5 +142,7 @@ setup(name=NAME,
       ],
       zip_safe=False,
       cmdclass={'dist': BuildDistCommand,
-                'test': TestCommand, 'check': TypeCheckCommand}
+                'test': TestCommand,
+                'check': TypeCheckCommand,
+                'upload': UploadCommand}
       )
