@@ -66,8 +66,7 @@ def build():
 
 
 def type_check():
-    exit_code = os.system("pyright --lib")
-    sys.exit(exit_code)
+    return os.system("pyright --lib")
 
 
 class BuildDistCommand(SetupCommand):
@@ -88,7 +87,10 @@ class TypeCheckCommand(SetupCommand):
     description = "Run type-checking."
 
     def run(self):
-        type_check()
+        exit_code = type_check()
+        self.status(
+            "Typecheck exited with code: {code}".format(code=exit_code))
+        sys.exit(exit_code)
 
 
 class TestCommand(SetupCommand):
@@ -97,6 +99,8 @@ class TestCommand(SetupCommand):
 
     def run(self):
         exit_code = os.system("pytest")
+        self.status(
+            "Tests exited with code: {code}".format(code=exit_code))
         sys.exit(exit_code)
 
 
