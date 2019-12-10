@@ -5,7 +5,7 @@ jobs: # A basic unit of work in a run
     working_directory: ~/py-http-types
     docker: # run the steps with Docker
       # CircleCI Python images available at: https://hub.docker.com/r/circleci/python/
-      - image: circleci/python:3.6.4
+      - image: circleci/python:3.6.4-node
         environment: # environment variables for primary container
           PIPENV_VENV_IN_PROJECT: "true"
     steps: # steps that comprise the `build` job
@@ -19,6 +19,7 @@ jobs: # A basic unit of work in a run
           command: |
             sudo pip install pipenv
             pipenv install -e .[dev]
+            pipenv update
       - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
@@ -27,4 +28,16 @@ jobs: # A basic unit of work in a run
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            pipenv run python setup.py test
+            export VENV_HOME_DIR=$(pipenv --venv)
+            source $VENV_HOME_DIR/bin/activate
+            pytest -s
+      - run:
+          name: Install pyright and run typecheck
+          command: |
+            set +e
+            echo 'export PATH=$(yarn global bin):$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            yarn global add pyright
+            export VENV_HOME_DIR=$(pipenv --venv)
+            source $VENV_HOME_DIR/bin/activate
+            pyright --lib

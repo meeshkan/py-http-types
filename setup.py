@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup, Command
+from setuptools import find_packages, setup, Command, errors
 from shutil import rmtree
 import os
 import sys
@@ -60,12 +60,12 @@ class SetupCommand(Command):
 
 
 def build():
-    os.system(
+    return os.system(
         "{executable} setup.py sdist bdist_wheel --universal".format(executable=sys.executable))
 
 
 def type_check():
-    os.system("pyright --lib")
+    return os.system("pyright --lib")
 
 
 class BuildDistCommand(SetupCommand):
@@ -77,7 +77,9 @@ class BuildDistCommand(SetupCommand):
         self.rmdir_if_exists(os.path.join(here, 'dist'))
 
         self.status("Building Source and Wheel (universal) distribution...")
-        build()
+        exit_code = build()
+        if exit_code != 0:
+            raise errors.DistutilsError("Build failed.")
         sys.exit()
 
 
@@ -86,8 +88,11 @@ class TypeCheckCommand(SetupCommand):
     description = "Run type-checking."
 
     def run(self):
-        type_check()
-        sys.exit()
+        exit_code = type_check()
+        self.status(
+            "Typecheck exited with code: {code}".format(code=exit_code))
+        if exit_code != 0:
+            raise errors.DistutilsError("Type-checking failed.")
 
 
 class TestCommand(SetupCommand):
@@ -95,8 +100,11 @@ class TestCommand(SetupCommand):
     description = "Run local test if they exist"
 
     def run(self):
-        os.system("pytest")
-        sys.exit()
+        exit_code = os.system("pytest")
+        self.status(
+            "Tests exited with code: {code}".format(code=exit_code))
+        if exit_code != 0:
+            raise errors.DistutilsError("Tests failed.")
 
 
 class UploadCommand(SetupCommand):
@@ -109,8 +117,9 @@ class UploadCommand(SetupCommand):
         self.rmdir_if_exists(os.path.join(here, 'dist'))
 
         self.status("Building Source and Wheel (universal) distribution...")
-        build()
-
+        exit_code = build()
+        if exit_code != 0:
+            raise errors.DistutilsError("Build failed.")
         self.status("Uploading the package to PyPI via Twine...")
         os.system("twine upload dist/*")
 
