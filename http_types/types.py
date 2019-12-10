@@ -16,6 +16,19 @@ HTTP request protocol.
 """
 Protocol = Literal['http', 'https']
 
+"""
+HTTP method.
+"""
+HttpMethod = Literal['get',
+                     'put',
+                     'post',
+                     'patch',
+                     'delete',
+                     'options',
+                     'trace',
+                     'head',
+                     'connect']
+
 
 class _Request(TypedDict, total=False):
     """
@@ -36,15 +49,7 @@ class Request(_Request, total=True):
     """
     Request method.
     """
-    method: Literal['get',
-                    'put',
-                    'post',
-                    'patch',
-                    'delete',
-                    'options',
-                    'trace',
-                    'head',
-                    'connect']
+    method: HttpMethod
 
     """
     Request headers.
@@ -118,4 +123,4 @@ class RequestResponsePair(TypedDict, total=True):
 
 
 __all__ = ["Request", "Response", "RequestResponsePair",
-           "Headers", "Query", "Protocol"]
+           "Headers", "Query", "Protocol", "HttpMethod"]
