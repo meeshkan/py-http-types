@@ -1,8 +1,9 @@
 
-from http_types.types import RequestResponsePair, Request, Response
+from http_types.types import HttpMethod, RequestResponsePair, Request, Response, Headers
 from typing import Any
 from typeguard import check_type
 import json
+from urllib.parse import urlparse
 
 __all__ = ["RequestBuilder", "ResponseBuilder", "RequestResponseBuilder"]
 
@@ -51,6 +52,41 @@ class RequestBuilder:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['body_as_json'] = body_as_json
         req = Request(**obj_copy)
+        RequestBuilder.validate(req)
+        return req
+
+    @staticmethod
+    def from_url(url: str, method: HttpMethod = "get", headers: Headers = {}) -> Request:
+        """Parse Request object from url.
+
+        Arguments:
+            url {str} -- URL as string.
+
+        Keyword Arguments:
+            method {HttpMethod} -- HTTP method. (default: {"get"})
+
+        Returns:
+            Request -- Request object.
+        """
+        parsed_url = urlparse(url)
+        protocol = parsed_url.scheme
+        # TODO Test and fix
+        path = parsed_url.netloc
+        pathname = parsed_url.netloc
+        # https://docs.python.org/3/library/urllib.parse.html
+        # TODO Parse query parameters
+        query = {}
+        # TODO Host
+        host = ""
+        req = Request(method=method,
+                      protocol=protocol,
+                      host=host,
+                      body="",
+                      body_as_json="",
+                      path=path,
+                      pathname=pathname,
+                      query=query,
+                      headers=headers)
         RequestBuilder.validate(req)
         return req
 
