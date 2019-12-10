@@ -1,5 +1,5 @@
 from http_types import Request, Response
-from typeguard import check_type
+from typeguard import check_type  # type:ignore
 
 req = Request(method="get",
               host="api.github.com",
