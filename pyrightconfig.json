@@ -1,4 +1,3 @@
 {
-  "typingsPath": "./typings",
   "include": ["http_types", "tests"]
 }
