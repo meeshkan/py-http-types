@@ -10,7 +10,6 @@ jobs: # A basic unit of work in a run
           PIPENV_VENV_IN_PROJECT: "true"
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
-      - run: yarn global add pyright
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - restore_cache:
@@ -30,5 +29,9 @@ jobs: # A basic unit of work in a run
           command: |
             pipenv run python setup.py test
       - run:
+          name: Install pyright and run typecheck
           command: |
+            echo 'export PATH=$(yarn global bin):$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            yarn global add pyright
             pipenv run python setup.py typecheck
