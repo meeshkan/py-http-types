@@ -143,6 +143,6 @@ setup(name=NAME,
       zip_safe=False,
       cmdclass={'dist': BuildDistCommand,
                 'test': TestCommand,
-                'type-check': TypeCheckCommand,
+                'typecheck': TypeCheckCommand,
                 'upload': UploadCommand}
       )
