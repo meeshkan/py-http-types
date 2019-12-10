@@ -8,3 +8,5 @@ node_modules
 .ipynb_checkpoints/
 .testmondata
 *.egg-info/
+dist/
+build/
