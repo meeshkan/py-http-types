@@ -28,7 +28,9 @@ jobs: # A basic unit of work in a run
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
-            pipenv run python setup.py test
+            export VENV_HOME_DIR=$(pipenv --venv)
+            source $VENV_HOME_DIR/bin/activate
+            pytest -s
       - run:
           name: Install pyright and run typecheck
           command: |
