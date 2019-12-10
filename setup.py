@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup, Command
+from setuptools import find_packages, setup, Command, errors
 from shutil import rmtree
 import os
 import sys
@@ -90,7 +90,8 @@ class TypeCheckCommand(SetupCommand):
         exit_code = type_check()
         self.status(
             "Typecheck exited with code: {code}".format(code=exit_code))
-        sys.exit(exit_code)
+        if exit_code != 0:
+            raise errors.DistutilsError("Type-checking failed.")
 
 
 class TestCommand(SetupCommand):
@@ -101,7 +102,8 @@ class TestCommand(SetupCommand):
         exit_code = os.system("pytest")
         self.status(
             "Tests exited with code: {code}".format(code=exit_code))
-        sys.exit(exit_code)
+        if exit_code != 0:
+            raise errors.DistutilsError("Tests failed.")
 
 
 class UploadCommand(SetupCommand):
