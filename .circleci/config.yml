@@ -38,4 +38,4 @@ jobs: # A basic unit of work in a run
             yarn global add pyright
             export VENV_HOME_DIR=$(pipenv --venv)
             source $VENV_HOME_DIR/bin/activate
-            python setup.py typecheck
+            pyright --lib
