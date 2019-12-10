@@ -60,9 +60,8 @@ class SetupCommand(Command):
 
 
 def build():
-    exit_code = os.system(
+    return os.system(
         "{executable} setup.py sdist bdist_wheel --universal".format(executable=sys.executable))
-    sys.exit(exit_code)
 
 
 def type_check():
@@ -78,7 +77,9 @@ class BuildDistCommand(SetupCommand):
         self.rmdir_if_exists(os.path.join(here, 'dist'))
 
         self.status("Building Source and Wheel (universal) distribution...")
-        build()
+        exit_code = build()
+        if exit_code != 0:
+            raise errors.DistutilsError("Build failed.")
         sys.exit()
 
 
@@ -116,8 +117,9 @@ class UploadCommand(SetupCommand):
         self.rmdir_if_exists(os.path.join(here, 'dist'))
 
         self.status("Building Source and Wheel (universal) distribution...")
-        build()
-
+        exit_code = build()
+        if exit_code != 0:
+            raise errors.DistutilsError("Build failed.")
         self.status("Uploading the package to PyPI via Twine...")
         os.system("twine upload dist/*")
 
