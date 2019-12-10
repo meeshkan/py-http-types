@@ -36,6 +36,6 @@ jobs: # A basic unit of work in a run
             echo 'export PATH=$(yarn global bin):$PATH' >> $BASH_ENV
             source $BASH_ENV
             yarn global add pyright
-            export VENV_HOME_DIR=$(pipenv --venv)
-            source $VENV_HOME_DIR/bin/activate
-            pyright --lib
+            # export VENV_HOME_DIR=$(pipenv --venv)
+            # source $VENV_HOME_DIR/bin/activate
+            pipenv run python setup.py typecheck

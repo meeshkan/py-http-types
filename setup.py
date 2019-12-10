@@ -60,12 +60,14 @@ class SetupCommand(Command):
 
 
 def build():
-    os.system(
+    exit_code = os.system(
         "{executable} setup.py sdist bdist_wheel --universal".format(executable=sys.executable))
+    sys.exit(exit_code)
 
 
 def type_check():
-    os.system("pyright --lib")
+    exit_code = os.system("pyright --lib")
+    sys.exit(exit_code)
 
 
 class BuildDistCommand(SetupCommand):
@@ -87,7 +89,6 @@ class TypeCheckCommand(SetupCommand):
 
     def run(self):
         type_check()
-        sys.exit()
 
 
 class TestCommand(SetupCommand):
@@ -95,8 +96,8 @@ class TestCommand(SetupCommand):
     description = "Run local test if they exist"
 
     def run(self):
-        os.system("pytest")
-        sys.exit()
+        exit_code = os.system("pytest")
+        sys.exit(exit_code)
 
 
 class UploadCommand(SetupCommand):
