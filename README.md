@@ -1,5 +1,7 @@
 # HTTP types in Python
 
+[![CircleCI](https://circleci.com/gh/Meeshkan/py-http-types.svg?style=svg)](https://circleci.com/gh/Meeshkan/py-http-types)
+
 Types for HTTP request and response.
 
 Requires **Python >= 3.6**.
