@@ -1,7 +1,7 @@
 
 from http_types.types import HttpMethod, Protocol, RequestResponsePair, Request, Response, Headers
 from typing import Any, cast
-from typeguard import check_type
+from typeguard import check_type  # type: ignore
 import json
 from urllib.parse import urlparse, parse_qs
 

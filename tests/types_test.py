@@ -11,7 +11,7 @@ req = Request(method="get",
               body_as_json="",
               headers={})
 
-res = Response(status_code=200, body="OK", body_as_json="OK")
+res = Response(status_code=200, body="OK", body_as_json="OK", headers={})
 
 
 def test_request_typechecks():

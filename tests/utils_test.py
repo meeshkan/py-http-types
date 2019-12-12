@@ -2,8 +2,8 @@ from http_types.utils import RequestBuilder
 from os import path
 import os
 import json
-from http_types import Request, Response, RequestResponsePair, RequestResponseBuilder
-from typeguard import check_type
+from http_types import RequestResponsePair, RequestResponseBuilder
+from typeguard import check_type  # type: ignore
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 SAMPLE_JSON = path.join(dir_path, "resources", "sample.json")
