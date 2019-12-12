@@ -1,9 +1,9 @@
 
-from http_types.types import HttpMethod, RequestResponsePair, Request, Response, Headers
-from typing import Any
+from http_types.types import HttpMethod, Protocol, RequestResponsePair, Request, Response, Headers
+from typing import Any, cast
 from typeguard import check_type
 import json
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 __all__ = ["RequestBuilder", "ResponseBuilder", "RequestResponseBuilder"]
 
@@ -35,6 +35,22 @@ def parse_pathname(path: str) -> str:
     return path
 
 
+def path_from_url(url: str) -> str:
+    """
+    Infer path from URL.
+
+    Arguments:
+        url {str} -- URL such as https://foo.bar/v1/
+
+    Returns:
+        str -- Path portion of the URL
+    """
+    splitted = url.split("/", 3)
+    if len(splitted) < 3:
+        return ""
+    return "/" + splitted[3]
+
+
 class RequestBuilder:
     def __init__(self):
         raise Exception("Do not instantiate")
@@ -56,6 +72,12 @@ class RequestBuilder:
         return req
 
     @staticmethod
+    def validate_protocol(proto: str) -> Protocol:
+        if not proto in ["http", "https"]:
+            raise BuilderException("")
+        return cast(Protocol, proto)
+
+    @staticmethod
     def from_url(url: str, method: HttpMethod = "get", headers: Headers = {}) -> Request:
         """Parse Request object from url.
 
@@ -68,16 +90,23 @@ class RequestBuilder:
         Returns:
             Request -- Request object.
         """
-        parsed_url = urlparse(url)
-        protocol = parsed_url.scheme
-        # TODO Test and fix
-        path = parsed_url.netloc
-        pathname = parsed_url.netloc
         # https://docs.python.org/3/library/urllib.parse.html
-        # TODO Parse query parameters
-        query = {}
-        # TODO Host
-        host = ""
+        parsed_url = urlparse(url)
+
+        protocol = RequestBuilder.validate_protocol(parsed_url.scheme)
+
+        # Path and pathname
+        pathname = parsed_url.path
+        path = path_from_url(url)
+
+        # Query string
+        query_str = parsed_url.query
+
+        # TODO Fix typing, parse_qs seems to return a lists as dictionary values?
+        query = parse_qs(query_str)
+
+        host = parsed_url.netloc
+
         req = Request(method=method,
                       protocol=protocol,
                       host=host,
