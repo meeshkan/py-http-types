@@ -61,12 +61,12 @@ class RequestBuilder:
 
         if not "pathname" in obj_copy:
             path = obj_copy['path']
-            # TODO Remove extra stuff from the path
             obj_copy['pathname'] = parse_pathname(path)
 
         if not "body_as_json" in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['body_as_json'] = body_as_json
+
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
         return req
