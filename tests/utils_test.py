@@ -31,3 +31,4 @@ def test_from_url():
     assert req['protocol'] == "https"
     assert req['path'] == "/v1/repos?id=1"
     assert req['pathname'] == "/v1/repos"
+    assert req['query'] == {'id': ['1']}
