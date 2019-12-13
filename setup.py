@@ -33,7 +33,7 @@ DEV = [
     'pyhamcrest'
 ]
 
-VERSION = '0.0.0'
+VERSION = '0.0.1'
 
 # Optional packages
 EXTRAS = {'dev': DEV}
