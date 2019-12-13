@@ -65,7 +65,7 @@ def build():
 
 
 def type_check():
-    return os.system("pyright --lib")
+    return os.system("pyright --lib -p pyrightconfig.json")
 
 
 class BuildDistCommand(SetupCommand):

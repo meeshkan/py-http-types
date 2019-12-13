@@ -29,12 +29,12 @@ req = Request(method="get",
               query={"id": ["1"]},
               body="",
               body_as_json="",
-              headers={})
+              headers={})  # Valid `Request` object, passes type-checking
 
-res = Response(status_code=200, body="OK", body_as_json="OK", headers={})
+res = Response(status_code=200, body="OK", headers={})  # Valid `Response` object, passes type-checking
 
-invalid_req = Request(method="get")  # Fails type-check, missing e.g. host!
-invalid_res = Response(body=1, ...)  # Fails type-checking, wrong type for body!
+invalid_req = Request(method="get")  # Fails type-checking, missing arguments
+invalid_res = Response(body=1, ...)  # Fails type-checking, wrong type for `body`
 ```
 
 ### Creating objects via helper methods
@@ -71,7 +71,22 @@ ResponseBuilder.validate(res)  # Validate `Response` object
 
 1. Create a new virtual environment.
 1. Install dependencies: `pip install --upgrade -e .[dev]`
-1. Run tests: `pytest tests/` or `python setup.py test`
+
+### Running tests
+
+Run `pytest tests/` or `python setup.py test`.
+
+Configuration for `pytest` is found in [pytest.ini](./pytest.ini) file.
+
+### Running type-checking
+
+Install [pyright](https://github.com/microsoft/pyright) and run `pyright --lib` or `python setup.py typecheck`.
+
+Configuration for `pyright` is found in [pyrightconfig.json](./pyrightconfig.json) file.
+
+### Automated tests
+
+See [.circleci/config.yml](./circleci/config.yml).
 
 ### Publishing package
 
