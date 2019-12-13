@@ -86,7 +86,7 @@ Configuration for `pyright` is found in [pyrightconfig.json](./pyrightconfig.jso
 
 ### Automated tests
 
-See [.circleci/config.yml](./circleci/config.yml).
+See [.circleci/config.yml](./.circleci/config.yml).
 
 ### Publishing package
 
