@@ -47,10 +47,8 @@ url = "https://api.github.com/v1/repos?id=1"
 req = RequestBuilder.from_url(url)  # Validated Request object
 
 # Create request object from dictionary
-
 req_obj = { 'method': 'get', 'body': 'body', ... }
 req = RequestBuilder.from_dict(req_obj)
-
 ```
 
 ### Validating objects
