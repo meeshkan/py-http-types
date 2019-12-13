@@ -18,7 +18,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 REQUIRED = [
     'typing-extensions',
-    'typeguard'
+    'typeguard>=2.7.0'
 ]
 
 DEV = [
