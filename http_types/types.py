@@ -1,15 +1,15 @@
 from typing_extensions import Literal, TypedDict
-from typing import Mapping, Any
+from typing import Any, Dict, Union, List
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.
 """
-Headers = Mapping[str, str]
+Headers = Dict[str, Union[str, List[str]]]
 
 """
 HTTP request query parameters.
 """
-Query = Mapping[str, str]
+Query = Dict[str, Union[str, List[str]]]
 
 """
 HTTP request protocol.
@@ -112,6 +112,9 @@ class Response(_Response, total=True):
 
     """ Response status code."""
     status_code: int
+
+    """ Response headers. """
+    headers: Headers
 
 
 class RequestResponsePair(TypedDict, total=True):
