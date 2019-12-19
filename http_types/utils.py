@@ -69,9 +69,9 @@ class RequestBuilder:
         if not "headers" in obj_copy:
             obj_copy['headers'] = {}
 
-        if not "body_as_json" in obj_copy:
+        if not "bodyAsJson" in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
-            obj_copy['body_as_json'] = body_as_json
+            obj_copy['bodyAsJson'] = body_as_json
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -117,7 +117,7 @@ class RequestBuilder:
                       protocol=protocol,
                       host=host,
                       body="",
-                      body_as_json="",
+                      bodyAsJson="",
                       path=path,
                       pathname=pathname,
                       query=query,
@@ -156,9 +156,9 @@ class ResponseBuilder:
     def from_dict(obj: Any) -> Response:
         obj_copy = dict(**obj)
 
-        if not "body_as_json" in obj_copy:
+        if not "bodyAsJson" in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
-            obj_copy['body_as_json'] = body_as_json
+            obj_copy['bodyAsJson'] = body_as_json
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)

@@ -38,7 +38,7 @@ class _Request(TypedDict, total=False):
     """
     HTTP request body as JSON. Could be dictionary, list, or string.
     """
-    body_as_json: Any
+    bodyAsJson: Any
 
 
 class Request(_Request, total=True):
@@ -97,7 +97,7 @@ class _Response(TypedDict, total=False):
     """
     Response body as JSON. Could be dictionary, list, or string.
     """
-    body_as_json: Any
+    bodyAsJson: Any
 
 
 class Response(_Response, total=True):
@@ -111,7 +111,7 @@ class Response(_Response, total=True):
     body: str
 
     """ Response status code."""
-    status_code: int
+    statusCode: int
 
     """ Response headers. """
     headers: Headers
