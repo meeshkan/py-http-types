@@ -28,10 +28,10 @@ req = Request(method="get",
               protocol="https",
               query={"id": ["1"]},
               body="",
-              body_as_json="",
+              bodyAsJson="",
               headers={})  # Valid `Request` object, passes type-checking
 
-res = Response(status_code=200, body="OK", headers={})  # Valid `Response` object, passes type-checking
+res = Response(statusCode=200, body="OK", headers={})  # Valid `Response` object, passes type-checking
 
 invalid_req = Request(method="get")  # Fails type-checking, missing arguments
 invalid_res = Response(body=1, ...)  # Fails type-checking, wrong type for `body`
@@ -47,8 +47,14 @@ url = "https://api.github.com/v1/repos?id=1"
 req = RequestBuilder.from_url(url)  # Validated Request object
 
 # Create request object from dictionary
-req_obj = { 'method': 'get', 'body': 'body', ... }
-req = RequestBuilder.from_dict(req_obj)
+req_obj = {
+    'host': 'api.github.com',
+    'protocol': 'https',
+    'method': 'get',
+    'path': '/v1/users',  # pathname inferred automatically
+    'query': {}
+}
+req = RequestBuilder.from_dict(req_obj)  # `body`, `pathname`, and `headers` are optional
 ```
 
 ### Validating objects
