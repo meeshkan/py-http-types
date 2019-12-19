@@ -8,10 +8,10 @@ req = Request(method="get",
               protocol="https",
               query={"id": ["1"]},
               body="",
-              body_as_json="",
+              bodyAsJson="",
               headers={})
 
-res = Response(status_code=200, body="OK", body_as_json="OK", headers={})
+res = Response(statusCode=200, body="OK", bodyAsJson="OK", headers={})
 
 
 def test_request_typechecks():
