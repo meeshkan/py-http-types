@@ -23,6 +23,22 @@ def test_typeguard():
     check_type("reqres", reqres, RequestResponsePair)
 
 
+def test_request_from_dict():
+    dict_req = {
+        'host': 'api.github.com',
+        'protocol': 'https',
+        'method': 'get',
+        'path': '/v1/users',
+        'query': {}
+    }
+    req = RequestBuilder.from_dict(dict_req)
+    assert req['method'] == "get"
+    assert req['host'] == "api.github.com"
+    assert req['protocol'] == "https"
+    assert req['body'] == ''
+    assert req['headers'] == {}
+
+
 def test_from_url():
     test_url = "https://api.github.com/v1/repos?id=1"
     req = RequestBuilder.from_url(test_url)
