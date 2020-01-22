@@ -1,6 +1,8 @@
 # HTTP types in Python
 
-[![CircleCI](https://circleci.com/gh/Meeshkan/py-http-types.svg?style=svg)](https://circleci.com/gh/Meeshkan/py-http-types)
+[![CircleCI](https://circleci.com/gh/Meeshkan/py-http-types.svg?style=shield)](https://circleci.com/gh/Meeshkan/py-http-types)
+[![PyPi](https://img.shields.io/pypi/pyversions/http-types)](https://pypi.org/project/http-types/)
+[![License](https://img.shields.io/pypi/l/http-types)](LICENSE)
 
 Types for HTTP request and response.
 
