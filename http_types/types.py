@@ -1,5 +1,5 @@
 from typing_extensions import Literal, TypedDict
-from typing import Any, Dict, Union, List, Mapping, Sequence
+from typing import Any, Union, Mapping, Sequence
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.
