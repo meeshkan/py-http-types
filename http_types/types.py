@@ -1,15 +1,15 @@
 from typing_extensions import Literal, TypedDict
-from typing import Any, Dict, Union, List
+from typing import Any, Union, Mapping, Sequence
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.
 """
-Headers = Dict[str, Union[str, List[str]]]
+Headers = Mapping[str, Union[str, Sequence[str]]]
 
 """
 HTTP request query parameters.
 """
-Query = Dict[str, Union[str, List[str]]]
+Query = Mapping[str, Union[str, Sequence[str]]]
 
 """
 HTTP request protocol.
