@@ -1,11 +1,11 @@
 
-from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers
+from http_types.types import HttpMethod, Protocol, RequestResponsePair, Request, Response, Headers
 from typing import Any, cast
 from typeguard import check_type  # type: ignore
 import json
 from urllib.parse import urlparse, parse_qs
 
-__all__ = ["RequestBuilder", "ResponseBuilder", "HttpExchangeBuilder"]
+__all__ = ["RequestBuilder", "ResponseBuilder", "RequestResponseBuilder"]
 
 
 class BuilderException(Exception):
@@ -174,15 +174,15 @@ class ResponseBuilder:
         check_type("response", response, Response)
 
 
-class HttpExchangeBuilder:
+class RequestResponseBuilder:
 
     def __init__(self):
         raise Exception("Do not instantiate")
 
     @staticmethod
-    def from_dict(obj: Any) -> HttpExchange:
+    def from_dict(obj: Any) -> RequestResponsePair:
         """
-        Build HttpExchange from dictionary, filling in any optional fields.
+        Build RequestResponsePair from dictionary, filling in any optional fields.
 
         Arguments:
             obj {Any} -- Dictionary containing at least protocol, hostname, path, and headers.
@@ -191,7 +191,7 @@ class HttpExchangeBuilder:
             BuilderException: For invalid dictionary.
 
         Returns:
-            HttpExchange -- Request-response pair.
+            RequestResponsePair -- Request-response pair.
         """
         if not 'req' in obj:
             raise BuilderException("Missing req")
@@ -205,15 +205,15 @@ class HttpExchangeBuilder:
         res_obj = obj['res']
         res = ResponseBuilder.from_dict(res_obj)
 
-        reqres = HttpExchange(req=req, res=res)
-        HttpExchangeBuilder.validate(reqres)
+        reqres = RequestResponsePair(req=req, res=res)
+        RequestResponseBuilder.validate(reqres)
         return reqres
 
     @staticmethod
-    def validate(reqres: HttpExchange) -> None:
+    def validate(reqres: RequestResponsePair) -> None:
         """Run-time typechecking for request-response pair.
 
         Arguments:
-            reqres {HttpExchange} -- Possible request-response object.
+            reqres {RequestResponsePair} -- Possible request-response object.
         """
-        check_type("request-response", reqres, HttpExchange)
+        check_type("request-response", reqres, RequestResponsePair)

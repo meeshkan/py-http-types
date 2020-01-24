@@ -117,7 +117,7 @@ class Response(_Response, total=True):
     headers: Headers
 
 
-class HttpExchange(TypedDict, total=True):
+class RequestResponsePair(TypedDict, total=True):
     """
     HTTP request-response pair.
     """
@@ -125,5 +125,5 @@ class HttpExchange(TypedDict, total=True):
     res: Response
 
 
-__all__ = ["Request", "Response", "HttpExchange",
+__all__ = ["Request", "Response", "RequestResponsePair",
            "Headers", "Query", "Protocol", "HttpMethod"]
