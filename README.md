@@ -42,7 +42,7 @@ invalid_res = Response(body=1, ...)  # Fails type-checking, wrong type for `body
 ### Creating objects via helper methods
 
 ```py
-from http_types import RequestBuilder, ResponseBuilder, RequestResponseBuilder
+from http_types import RequestBuilder, ResponseBuilder, HttpExchangeBuilder
 
 # Create Request object from URL
 url = "https://api.github.com/v1/repos?id=1"
