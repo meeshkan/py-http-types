@@ -1,6 +1,6 @@
 
 from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers
-from typing import Any, cast
+from typing import Any, cast, Generator, IO
 from typeguard import check_type  # type: ignore
 import json
 from urllib.parse import urlparse, parse_qs
@@ -217,3 +217,13 @@ class HttpExchangeBuilder:
             reqres {HttpExchange} -- Possible request-response object.
         """
         check_type("request-response", reqres, HttpExchange)
+
+    @staticmethod
+    def from_jsonl(input_file: IO) -> Generator[HttpExchange, None, None]:
+        """Read Http exchanges line by line from a file-like object.
+
+        Arguments:
+            input_file: {IO} -- The input to read from.
+        """
+        for line in input_file:
+            yield HttpExchangeBuilder.from_dict(json.loads(line))
