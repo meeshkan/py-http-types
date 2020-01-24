@@ -2,7 +2,7 @@ from http_types.utils import RequestBuilder
 from os import path
 import os
 import json
-from http_types import RequestResponsePair, RequestResponseBuilder
+from http_types import HttpExchange, HttpExchangeBuilder
 from typeguard import check_type  # type: ignore
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -19,8 +19,8 @@ request_response_pair = read_example()
 
 
 def test_typeguard():
-    reqres = RequestResponseBuilder.from_dict(request_response_pair)
-    check_type("reqres", reqres, RequestResponsePair)
+    reqres = HttpExchangeBuilder.from_dict(request_response_pair)
+    check_type("reqres", reqres, HttpExchange)
 
 
 def test_request_from_dict():
