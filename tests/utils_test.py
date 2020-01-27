@@ -1,4 +1,4 @@
-from http_types.utils import RequestBuilder
+from http_types.utils import ResponseBuilder, RequestBuilder
 from os import path
 import os
 import json
@@ -24,12 +24,29 @@ def test_typeguard():
     check_type("reqres", reqres, HttpExchange)
 
 
+def test_response_from_dict():
+    dict_req = {
+        'statusCode': 200,
+        'headers': {
+            'Content-Length': '10'
+        },
+        'body': 'abcdefghij'
+    }
+    res = ResponseBuilder.from_dict(dict_req)
+    assert res['statusCode'] == 200
+    assert res['body'] == 'abcdefghij'
+    assert res['headers'] == {'content-length': '10'}
+
+
 def test_request_from_dict():
     dict_req = {
         'host': 'api.github.com',
         'protocol': 'https',
         'method': 'get',
         'path': '/v1/users',
+        'headers': {
+            'Accept': '*/*'
+        },
         'query': {}
     }
     req = RequestBuilder.from_dict(dict_req)
@@ -37,10 +54,10 @@ def test_request_from_dict():
     assert req['host'] == "api.github.com"
     assert req['protocol'] == "https"
     assert req['body'] == ''
-    assert req['headers'] == {}
+    assert req['headers'] == {'accept': '*/*'}
 
 
-def test_from_url():
+def test_request_from_url():
     test_url = "https://api.github.com/v1/repos?id=1"
     req = RequestBuilder.from_url(test_url)
     assert req['method'] == "get"

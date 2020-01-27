@@ -59,17 +59,19 @@ class RequestBuilder:
     def from_dict(obj: Any) -> Request:
         obj_copy = dict(**obj)
 
-        if not "pathname" in obj_copy:
+        if "pathname" not in obj_copy:
             path = obj_copy['path']
             obj_copy['pathname'] = parse_pathname(path)
 
-        if not "body" in obj_copy:
+        if "body" not in obj_copy:
             obj_copy['body'] = ""
 
-        if not "headers" in obj_copy:
+        if "headers" in obj_copy:
+            obj_copy['headers'] = {key.lower(): value for key, value in obj_copy['headers'].items()}
+        else:
             obj_copy['headers'] = {}
 
-        if not "bodyAsJson" in obj_copy:
+        if "bodyAsJson" not in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['bodyAsJson'] = body_as_json
 
@@ -156,7 +158,12 @@ class ResponseBuilder:
     def from_dict(obj: Any) -> Response:
         obj_copy = dict(**obj)
 
-        if not "bodyAsJson" in obj_copy:
+        if "headers" in obj_copy:
+            obj_copy['headers'] = {key.lower(): value for key, value in obj_copy['headers'].items()}
+        else:
+            obj_copy['headers'] = {}
+
+        if "bodyAsJson" not in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['bodyAsJson'] = body_as_json
 
