@@ -121,8 +121,8 @@ class HttpExchange(TypedDict, total=True):
     """
     HTTP request-response pair.
     """
-    req: Request
-    res: Response
+    request: Request
+    response: Response
 
 
 __all__ = ["Request", "Response", "HttpExchange",

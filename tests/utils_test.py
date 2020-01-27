@@ -53,5 +53,5 @@ def test_from_url():
 def test_from_jsonl():
     with open(SAMPLE_JSONL, "r", encoding="utf-8") as f:
         exchanges = list(HttpExchangeBuilder.from_jsonl(f))
-        assert exchanges[0]['req']['protocol'] == 'http'
-        assert exchanges[1]['req']['protocol'] == 'https'
+        assert exchanges[0]['request']['protocol'] == 'http'
+        assert exchanges[1]['request']['protocol'] == 'https'

@@ -1,6 +1,6 @@
 
 from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers
-from typing import Any, cast, Generator, IO
+from typing import Any, cast, Dict, Generator, IO
 from typeguard import check_type  # type: ignore
 import json
 from urllib.parse import urlparse, parse_qs
@@ -56,7 +56,7 @@ class RequestBuilder:
         raise Exception("Do not instantiate")
 
     @staticmethod
-    def from_dict(obj: Any) -> Request:
+    def from_dict(obj: Dict) -> Request:
         obj_copy = dict(**obj)
 
         if not "pathname" in obj_copy:
@@ -193,19 +193,19 @@ class HttpExchangeBuilder:
         Returns:
             HttpExchange -- Request-response pair.
         """
-        if not 'req' in obj:
-            raise BuilderException("Missing req")
+        if not 'request' in obj:
+            raise BuilderException("Missing request")
 
-        if not 'res' in obj:
-            raise BuilderException("Missing res")
+        if not 'response' in obj:
+            raise BuilderException("Missing response")
 
-        req_obj = obj['req']
+        req_obj = obj['request']
         req = RequestBuilder.from_dict(req_obj)
 
-        res_obj = obj['res']
+        res_obj = obj['response']
         res = ResponseBuilder.from_dict(res_obj)
 
-        reqres = HttpExchange(req=req, res=res)
+        reqres = HttpExchange(request=req, response=res)
         HttpExchangeBuilder.validate(reqres)
         return reqres
 
