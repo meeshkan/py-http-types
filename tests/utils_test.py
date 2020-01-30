@@ -41,17 +41,28 @@ def test_request_from_dict():
 
 
 def test_from_url():
-    test_url = "https://api.github.com/v1/repos?id=1"
+    test_url = "https://api.github.com/v1/repos?id=1&q=v1&q=v2"
     req = RequestBuilder.from_url(test_url)
     assert req['method'] == "get"
     assert req['host'] == "api.github.com"
     assert req['protocol'] == "https"
-    assert req['path'] == "/v1/repos?id=1"
+    assert req['path'] == "/v1/repos?id=1&q=v1&q=v2"
     assert req['pathname'] == "/v1/repos"
-    assert req['query'] == {'id': ['1']}
+    assert req['query'] == {'id': "1", 'q': ["v1", "v2"]}
+
 
 def test_from_jsonl():
     with open(SAMPLE_JSONL, "r", encoding="utf-8") as f:
         exchanges = list(HttpExchangeBuilder.from_jsonl(f))
-        assert exchanges[0]['request']['protocol'] == 'http'
-        assert exchanges[1]['request']['protocol'] == 'https'
+        assert len(exchanges) == 3
+        assert exchanges[0]['request']['protocol'] == "http"
+        assert exchanges[1]['request']['protocol'] == "https"
+
+        for exchange in exchanges[0:2]:
+            assert exchange['request']['path'] == '/user/repos?q=v'
+            assert exchange['request']['pathname'] == '/user/repos'
+            assert exchange['request']['query'] == {'q': "v"}
+
+        assert exchanges[2]['request']['path'] == '/user/repos'
+        assert exchanges[2]['request']['pathname'] == '/user/repos'
+        assert exchanges[2]['request']['query'] == {}

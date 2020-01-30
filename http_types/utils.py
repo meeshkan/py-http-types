@@ -1,9 +1,9 @@
 
-from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers
+from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
 from typing import Any, cast, Dict, Generator, IO
 from typeguard import check_type  # type: ignore
 import json
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlencode, urlparse, parse_qs
 
 __all__ = ["RequestBuilder", "ResponseBuilder", "HttpExchangeBuilder"]
 
@@ -32,7 +32,7 @@ def parse_pathname(path: str) -> str:
     Returns:
         str -- [description]
     """
-    return path
+    return urlparse(path).path
 
 
 def path_from_url(url: str) -> str:
@@ -51,6 +51,14 @@ def path_from_url(url: str) -> str:
     return "/" + splitted[3]
 
 
+def parse_qs_flattening(query_string: str) -> Query:
+    query_dict: Dict = parse_qs(query_string)
+    for (key, values) in query_dict.items():
+        if len(values) == 1:
+            query_dict[key] = values[0]
+    return query_dict
+
+
 class RequestBuilder:
     def __init__(self):
         raise Exception("Do not instantiate")
@@ -58,6 +66,18 @@ class RequestBuilder:
     @staticmethod
     def from_dict(obj: Dict) -> Request:
         obj_copy = dict(**obj)
+
+        if not "query" in obj_copy and "path" in obj_copy:
+            query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)
+            obj_copy['query'] = query_dict
+
+        if not "path" in obj_copy:
+            if not "pathname" in obj_copy:
+                raise Exception("One of 'path' or 'pathname' is required")
+            path = obj_copy["pathname"]
+            if "query" in obj_copy:
+                path += "?" + urlencode(obj_copy["query"])
+            obj_copy['path'] = path
 
         if not "pathname" in obj_copy:
             path = obj_copy['path']
@@ -108,8 +128,7 @@ class RequestBuilder:
         # Query string
         query_str = parsed_url.query
 
-        # TODO Fix typing, parse_qs seems to return a lists as dictionary values?
-        query = parse_qs(query_str)
+        query = parse_qs_flattening(query_str)
 
         host = parsed_url.netloc
 
