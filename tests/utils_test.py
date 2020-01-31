@@ -1,8 +1,10 @@
 from http_types.utils import RequestBuilder
+from datetime import datetime
+from io import StringIO
 from os import path
 import os
 import json
-from http_types import HttpExchange, HttpExchangeBuilder
+from http_types import HttpExchange, HttpExchangeBuilder, HttpExchangeReader, HttpExchangeWriter
 from typeguard import check_type  # type: ignore
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -51,18 +53,55 @@ def test_from_url():
     assert req['query'] == {'id': "1", 'q': ["v1", "v2"]}
 
 
+def test_from_json():
+    with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
+        exchange = HttpExchangeReader.from_json(f.read())
+        assert exchange['request']['timestamp'] == datetime.fromisoformat("2018-11-13T20:20:39+02:00")
+        assert exchange['response']['timestamp'] == datetime.fromisoformat("2020-01-31T13:34:15")
+
+
+def test_invalid_timestamp_in_json():
+    with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
+        json_string = f.read().replace("2018-11-13T20:20:39+02:00", "INVALID_STRING")
+        try:
+            exchange = HttpExchangeReader.from_json(json_string)
+            raise AssertionError("No exception raised from invalid timestamp")
+        except ValueError as e:
+            assert str(e).startswith("Invalid isoformat string")
+
+
 def test_from_jsonl():
     with open(SAMPLE_JSONL, "r", encoding="utf-8") as f:
-        exchanges = list(HttpExchangeBuilder.from_jsonl(f))
-        assert len(exchanges) == 3
-        assert exchanges[0]['request']['protocol'] == "http"
-        assert exchanges[1]['request']['protocol'] == "https"
+        exchanges = list(HttpExchangeReader.from_jsonl(f))
+        validate_sample_exchanges(exchanges)
 
-        for exchange in exchanges[0:2]:
-            assert exchange['request']['path'] == '/user/repos?q=v'
-            assert exchange['request']['pathname'] == '/user/repos'
-            assert exchange['request']['query'] == {'q': "v"}
 
-        assert exchanges[2]['request']['path'] == '/user/repos'
-        assert exchanges[2]['request']['pathname'] == '/user/repos'
-        assert exchanges[2]['request']['query'] == {}
+def validate_sample_exchanges(exchanges):
+    assert len(exchanges) == 3
+    assert exchanges[0]['request']['protocol'] == "http"
+    assert exchanges[1]['request']['protocol'] == "https"
+
+    for exchange in exchanges[0:2]:
+        assert exchange['request']['path'] == '/user/repos?q=v'
+        assert exchange['request']['pathname'] == '/user/repos'
+        assert exchange['request']['query'] == {'q': "v"}
+
+    assert exchanges[2]['request']['path'] == '/user/repos'
+    assert exchanges[2]['request']['pathname'] == '/user/repos'
+    assert exchanges[2]['request']['query'] == {}
+
+
+def test_writing_json():
+    buffer = StringIO()
+    writer = HttpExchangeWriter(buffer)
+
+    original_exchanges = []
+    with open(SAMPLE_JSONL, "r", encoding="utf-8") as f:
+        for exchange in HttpExchangeReader.from_jsonl(f):
+            original_exchanges.append(exchange)
+            writer.write(exchange)
+
+    buffer.seek(0)
+    exchanges = list(HttpExchangeReader.from_jsonl(buffer))
+    validate_sample_exchanges(exchanges)
+    assert original_exchanges == exchanges

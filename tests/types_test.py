@@ -9,9 +9,10 @@ req = Request(method="get",
               query={"id": ["1"]},
               body="",
               bodyAsJson="",
-              headers={})
+              headers={},
+              timestamp=None)
 
-res = Response(statusCode=200, body="OK", bodyAsJson="OK", headers={})
+res = Response(statusCode=200, body="OK", bodyAsJson="OK", headers={}, timestamp=None)
 
 
 def test_request_typechecks():

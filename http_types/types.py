@@ -1,5 +1,6 @@
+from datetime import datetime
 from typing_extensions import Literal, TypedDict
-from typing import Any, Union, Mapping, Sequence
+from typing import Any, Union, Mapping, Optional, Sequence
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.
@@ -39,6 +40,11 @@ class _Request(TypedDict, total=False):
     HTTP request body as JSON. Could be dictionary, list, or string.
     """
     bodyAsJson: Any
+
+    """
+    Timestamp when the request was initiated.
+    """
+    timestamp: Optional[datetime]
 
 
 class Request(_Request, total=True):
@@ -98,6 +104,11 @@ class _Response(TypedDict, total=False):
     Response body as JSON. Could be dictionary, list, or string.
     """
     bodyAsJson: Any
+
+    """
+    Timestamp when the response was sent.
+    """
+    timestamp: Optional[datetime]
 
 
 class Response(_Response, total=True):

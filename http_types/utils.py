@@ -1,12 +1,15 @@
 
+from datetime import datetime
 from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
-from typing import Any, cast, Dict, Generator, IO
+from typing import Any, cast, Dict, Generator, IO, Union
 from typeguard import check_type  # type: ignore
 import json
 from urllib.parse import urlencode, urlparse, parse_qs
+from backports.datetime_fromisoformat import MonkeyPatch
 
-__all__ = ["RequestBuilder", "ResponseBuilder", "HttpExchangeBuilder"]
+__all__ = ["RequestBuilder", "ResponseBuilder", "HttpExchangeBuilder", "HttpExchangeReader", "HttpExchangeWriter"]
 
+MonkeyPatch.patch_fromisoformat()
 
 class BuilderException(Exception):
     pass
@@ -59,6 +62,16 @@ def parse_qs_flattening(query_string: str) -> Query:
     return query_dict
 
 
+def delete_none_entries(d):
+    result = d.copy()
+    for key, value in d.items():
+        if value is None or value == '':
+            del result[key]
+        elif isinstance(value, dict):
+            result[key] = delete_none_entries(value)
+    return result
+
+
 class RequestBuilder:
     def __init__(self):
         raise Exception("Do not instantiate")
@@ -92,6 +105,11 @@ class RequestBuilder:
         if not "bodyAsJson" in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['bodyAsJson'] = body_as_json
+
+        if "timestamp" in obj_copy:
+            obj_copy['timestamp'] = datetime.fromisoformat(obj_copy['timestamp'])
+        else:
+            obj_copy['timestamp'] = None
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -140,7 +158,8 @@ class RequestBuilder:
                       path=path,
                       pathname=pathname,
                       query=query,
-                      headers=headers)
+                      headers=headers,
+                      timestamp=None)
         RequestBuilder.validate(req)
         return req
 
@@ -178,6 +197,11 @@ class ResponseBuilder:
         if not "bodyAsJson" in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['bodyAsJson'] = body_as_json
+
+        if "timestamp" in obj_copy:
+            obj_copy['timestamp'] = datetime.fromisoformat(obj_copy['timestamp'])
+        else:
+            obj_copy['timestamp'] = None
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)
@@ -237,12 +261,58 @@ class HttpExchangeBuilder:
         """
         check_type("request-response", reqres, HttpExchange)
 
+
+class HttpExchangeReader:
+
+    def __init__(self):
+        raise Exception("Do not instantiate")
+
     @staticmethod
-    def from_jsonl(input_file: IO) -> Generator[HttpExchange, None, None]:
-        """Read Http exchanges line by line from a file-like object.
+    def from_json(input_json: Union[str, bytes]) -> HttpExchange:
+        """Read a single HTTP exchange from a JSON string.
+
+        Arguments:
+            input_json: {str} -- The input JSON to parse.
+        """
+        return HttpExchangeBuilder.from_dict(json.loads(input_json))
+
+    @staticmethod
+    def from_jsonl(input_file: IO[str]) -> Generator[HttpExchange, None, None]:
+        """Read HTTP exchanges line by line from a file-like object.
 
         Arguments:
             input_file: {IO} -- The input to read from.
         """
         for line in input_file:
-            yield HttpExchangeBuilder.from_dict(json.loads(line))
+            yield HttpExchangeReader.from_json(line)
+
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
+
+
+class HttpExchangeWriter:
+
+    def __init__(self, output: IO[str]):
+        """Create a writer of HTTP exchanges.
+
+        Each exchange will be written as a JSON object in the HTTP types
+        format on a single line.
+
+        Arguments:
+            output: {IO} -- The output to write to
+        """
+        self.output = output
+
+    def write(self, exchange: HttpExchange):
+        """Write a single HTTP exchange line to the output.
+
+        Arguments:
+            exchange: {HttpExchange} -- The exchange to write.
+        """
+        json.dump(delete_none_entries(exchange), self.output, default=json_serial)
+        self.output.write("\n")
