@@ -76,7 +76,7 @@ ResponseBuilder.validate(res)  # Validate `Response` object
 ### Local development
 
 1. Create a new virtual environment.
-1. Install dependencies: `pip install --upgrade -e .[dev]`
+1. Install dependencies: `pip install --upgrade -e '.[dev]'`
 
 ### Running tests
 

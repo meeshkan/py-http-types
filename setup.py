@@ -17,6 +17,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 REQUIRED = [
+    'backports-datetime-fromisoformat',
     'typing-extensions',
     'typeguard>=2.7.0'
 ]
@@ -33,7 +34,7 @@ DEV = [
     'pyhamcrest'
 ]
 
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 
 # Optional packages
 EXTRAS = {'dev': DEV}
