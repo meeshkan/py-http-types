@@ -2,7 +2,6 @@
 from datetime import datetime
 from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
 from typing import Any, cast, Dict, Generator, IO, Union
-from typeguard import check_type  # type: ignore
 import json
 from urllib.parse import urlencode, urlparse, parse_qs
 from backports.datetime_fromisoformat import MonkeyPatch
@@ -108,8 +107,6 @@ class RequestBuilder:
 
         if "timestamp" in obj_copy:
             obj_copy['timestamp'] = datetime.fromisoformat(obj_copy['timestamp'])
-        else:
-            obj_copy['timestamp'] = None
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -170,7 +167,6 @@ class RequestBuilder:
         Arguments:
             request {Request} -- Possible request object.
         """
-        check_type("request", request, Request)
         method = request['method']
         # typeguard does not support checking Literal from typing-extensions,
         # so check it by hand
@@ -200,8 +196,6 @@ class ResponseBuilder:
 
         if "timestamp" in obj_copy:
             obj_copy['timestamp'] = datetime.fromisoformat(obj_copy['timestamp'])
-        else:
-            obj_copy['timestamp'] = None
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)
@@ -214,7 +208,7 @@ class ResponseBuilder:
         Arguments:
             response {Response} -- Possible response object.
         """
-        check_type("response", response, Response)
+        pass
 
 
 class HttpExchangeBuilder:
@@ -259,7 +253,7 @@ class HttpExchangeBuilder:
         Arguments:
             reqres {HttpExchange} -- Possible request-response object.
         """
-        check_type("request-response", reqres, HttpExchange)
+        pass
 
 
 class HttpExchangeReader:
