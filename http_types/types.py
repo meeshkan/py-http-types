@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing_extensions import Literal, TypedDict
-from typing import Any, Union, Mapping, Optional, Sequence
+from typing import Any, Union, Mapping, Sequence
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.
@@ -44,7 +44,7 @@ class _Request(TypedDict, total=False):
     """
     Timestamp when the request was initiated.
     """
-    timestamp: Optional[datetime]
+    timestamp: datetime
 
 
 class Request(_Request, total=True):
@@ -108,7 +108,7 @@ class _Response(TypedDict, total=False):
     """
     Timestamp when the response was sent.
     """
-    timestamp: Optional[datetime]
+    timestamp: datetime
 
 
 class Response(_Response, total=True):

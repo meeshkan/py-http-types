@@ -1,5 +1,6 @@
 from http_types import Request, Response
 from typeguard import check_type  # type:ignore
+from datetime import datetime
 
 req = Request(method="get",
               host="api.github.com",
@@ -10,9 +11,9 @@ req = Request(method="get",
               body="",
               bodyAsJson="",
               headers={},
-              timestamp=None)
+              timestamp=datetime.now())
 
-res = Response(statusCode=200, body="OK", bodyAsJson="OK", headers={}, timestamp=None)
+res = Response(statusCode=200, body="OK", bodyAsJson="OK", headers={}, timestamp=datetime.now())
 
 
 def test_request_typechecks():
