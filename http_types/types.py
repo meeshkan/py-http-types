@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing_extensions import Literal, TypedDict
 from typing import Any, Union, Mapping, Sequence
+from typing_extensions import Literal, TypedDict
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.

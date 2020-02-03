@@ -1,10 +1,9 @@
-
-from datetime import datetime
-from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
-from typing import Any, cast, Dict, Generator, IO, Union
 import json
+from datetime import datetime
+from typing import Any, cast, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
 from backports.datetime_fromisoformat import MonkeyPatch
+from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
 
 __all__ = ["RequestBuilder", "ResponseBuilder", "HttpExchangeBuilder", "HttpExchangeReader", "HttpExchangeWriter"]
 
@@ -79,29 +78,29 @@ class RequestBuilder:
     def from_dict(obj: Dict) -> Request:
         obj_copy = dict(**obj)
 
-        if not "query" in obj_copy and "path" in obj_copy:
+        if "query" not in obj_copy and "path" in obj_copy:
             query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)
             obj_copy['query'] = query_dict
 
-        if not "path" in obj_copy:
-            if not "pathname" in obj_copy:
+        if "path" not in obj_copy:
+            if "pathname" not in obj_copy:
                 raise Exception("One of 'path' or 'pathname' is required")
             path = obj_copy["pathname"]
             if "query" in obj_copy:
                 path += "?" + urlencode(obj_copy["query"])
             obj_copy['path'] = path
 
-        if not "pathname" in obj_copy:
+        if "pathname" not in obj_copy:
             path = obj_copy['path']
             obj_copy['pathname'] = parse_pathname(path)
 
-        if not "body" in obj_copy:
+        if "body" not in obj_copy:
             obj_copy['body'] = ""
 
-        if not "headers" in obj_copy:
+        if "headers" not in obj_copy:
             obj_copy['headers'] = {}
 
-        if not "bodyAsJson" in obj_copy:
+        if "bodyAsJson" not in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['bodyAsJson'] = body_as_json
 
@@ -189,7 +188,7 @@ class ResponseBuilder:
     def from_dict(obj: Any) -> Response:
         obj_copy = dict(**obj)
 
-        if not "bodyAsJson" in obj_copy:
+        if "bodyAsJson" not in obj_copy:
             body_as_json = parse_body(obj_copy['body'])
             obj_copy['bodyAsJson'] = body_as_json
 
@@ -211,12 +210,13 @@ class ResponseBuilder:
 
 
 class HttpExchangeBuilder:
+    """Builder of HttpExchange instances with the from_dict() method."""
 
     def __init__(self):
         raise Exception("Do not instantiate")
 
     @staticmethod
-    def from_dict(obj: Any) -> HttpExchange:
+    def from_dict(obj: Dict) -> HttpExchange:
         """
         Build HttpExchange from dictionary, filling in any optional fields.
 
@@ -229,10 +229,10 @@ class HttpExchangeBuilder:
         Returns:
             HttpExchange -- Request-response pair.
         """
-        if not 'request' in obj:
+        if 'request' not in obj:
             raise BuilderException("Missing request")
 
-        if not 'response' in obj:
+        if 'response' not in obj:
             raise BuilderException("Missing response")
 
         req_obj = obj['request']
@@ -285,7 +285,7 @@ def json_serial(obj):
 
     if isinstance(obj, datetime):
         return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 class HttpExchangeWriter:
