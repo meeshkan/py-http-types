@@ -4,9 +4,7 @@
 [![PyPi](https://img.shields.io/pypi/pyversions/http-types)](https://pypi.org/project/http-types/)
 [![License](https://img.shields.io/pypi/l/http-types)](LICENSE)
 
-Types for HTTP request and response.
-
-Requires **Python >= 3.6**.
+Python (3.6 or later) library to read and write records of HTTP exchanges in the [HTTP types](https://meeshkan.github.io/http-types/) format.
 
 ## Installation
 
