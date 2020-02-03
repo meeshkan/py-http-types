@@ -155,8 +155,7 @@ class RequestBuilder:
                       path=path,
                       pathname=pathname,
                       query=query,
-                      headers=headers,
-                      timestamp=None)
+                      headers=headers)
         RequestBuilder.validate(req)
         return req
 
