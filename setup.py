@@ -17,7 +17,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 REQUIRED = [
-    'backports-datetime-fromisoformat',
+    'python-dateutil',
     'typing-extensions',
     'typeguard>=2.7.0'
 ]

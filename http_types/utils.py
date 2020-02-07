@@ -2,15 +2,12 @@ import json
 from datetime import datetime
 from typing import Any, cast, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
-from backports.datetime_fromisoformat import MonkeyPatch
+from dateutil.parser import isoparse
 from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
 import re
 
 __all__ = ["RequestBuilder", "ResponseBuilder",
            "HttpExchangeBuilder", "HttpExchangeReader", "HttpExchangeWriter"]
-
-MonkeyPatch.patch_fromisoformat()
-
 
 class BuilderException(Exception):
     pass
@@ -115,8 +112,13 @@ class RequestBuilder:
             obj_copy['bodyAsJson'] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = datetime.fromisoformat(
-                obj_copy['timestamp'])
+            string_format = obj_copy['timestamp']
+            try:
+                obj_copy['timestamp'] = isoparse(string_format)
+            except ValueError:
+                # The error message from isoparse() is not informative,
+                # so we provide our own:
+                raise ValueError("Invalid isoformat string: INVALID_STRING")
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -204,7 +206,7 @@ class ResponseBuilder:
             obj_copy['bodyAsJson'] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = datetime.fromisoformat(
+            obj_copy['timestamp'] = isoparse(
                 obj_copy['timestamp'])
 
         res = Response(**obj_copy)
