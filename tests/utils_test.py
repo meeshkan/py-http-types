@@ -53,18 +53,34 @@ def test_from_url():
     assert req['query'] == {'id': "1", 'q': ["v1", "v2"]}
 
 
+def test_from_url_without_path():
+    test_url = "https://api.github.com"
+    req = RequestBuilder.from_url(test_url)
+    assert req['path'] == "/"
+    assert req['pathname'] == "/"
+
+
+def test_from_url_with_root_path():
+    test_url = "https://api.github.com/"
+    req = RequestBuilder.from_url(test_url)
+    assert req['path'] == "/"
+    assert req['pathname'] == "/"
+
+
 def test_from_json():
     with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
         exchange = HttpExchangeReader.from_json(f.read())
-        assert exchange['request']['timestamp'] == datetime.fromisoformat("2018-11-13T20:20:39+02:00")
-        assert exchange['response']['timestamp'] == datetime.fromisoformat("2020-01-31T13:34:15")
+        assert exchange['request']['timestamp'] == datetime.fromisoformat(
+            "2018-11-13T20:20:39+02:00")
+        assert exchange['response']['timestamp'] == datetime.fromisoformat(
+            "2020-01-31T13:34:15")
 
 
 def test_invalid_timestamp_in_json():
     with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
         json_string = f.read().replace("2018-11-13T20:20:39+02:00", "INVALID_STRING")
         try:
-            exchange = HttpExchangeReader.from_json(json_string)
+            HttpExchangeReader.from_json(json_string)
             raise AssertionError("No exception raised from invalid timestamp")
         except ValueError as e:
             assert str(e).startswith("Invalid isoformat string")
