@@ -39,7 +39,7 @@ def parse_pathname(path: str) -> str:
     return urlparse(path).path
 
 
-path_capture = re.compile(r"https?:\/\/[a-zA-Z\.]+(?:(\/(?:\S)*)|$)")
+path_capture = re.compile(r"$https?:\/\/[a-zA-Z\.]+(?:(\/(?:\S)*)|$)")
 
 
 def path_from_url(url: str) -> str:
@@ -54,7 +54,7 @@ def path_from_url(url: str) -> str:
     """
     match_result = path_capture.match(url)
     if match_result is None:
-        raise Exception("Cannot parse URL {url}".format(url=url))
+        raise Exception("Unknown format for url {url}".format(url=url))
     groups = match_result.groups()
     if len(groups) == 0 or groups[0] == None:  # Path empty
         return "/"
