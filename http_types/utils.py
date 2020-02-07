@@ -4,10 +4,13 @@ from typing import Any, cast, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
 from backports.datetime_fromisoformat import MonkeyPatch
 from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
+import re
 
-__all__ = ["RequestBuilder", "ResponseBuilder", "HttpExchangeBuilder", "HttpExchangeReader", "HttpExchangeWriter"]
+__all__ = ["RequestBuilder", "ResponseBuilder",
+           "HttpExchangeBuilder", "HttpExchangeReader", "HttpExchangeWriter"]
 
 MonkeyPatch.patch_fromisoformat()
+
 
 class BuilderException(Exception):
     pass
@@ -36,6 +39,9 @@ def parse_pathname(path: str) -> str:
     return urlparse(path).path
 
 
+path_capture = re.compile(r"https?:\/\/[a-zA-Z\.]+(?:(\/(?:\S)*)|$)")
+
+
 def path_from_url(url: str) -> str:
     """
     Infer path from URL.
@@ -46,10 +52,14 @@ def path_from_url(url: str) -> str:
     Returns:
         str -- Path portion of the URL
     """
-    splitted = url.split("/", 3)
-    if len(splitted) < 3:
-        return ""
-    return "/" + splitted[3]
+    match_result = path_capture.match(url)
+    if match_result is None:
+        raise Exception("Cannot parse URL {url}".format(url=url))
+    groups = match_result.groups()
+    if len(groups) == 0 or groups[0] == None:  # Path empty
+        return "/"
+    else:
+        return groups[0]
 
 
 def parse_qs_flattening(query_string: str) -> Query:
@@ -105,7 +115,8 @@ class RequestBuilder:
             obj_copy['bodyAsJson'] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = datetime.fromisoformat(obj_copy['timestamp'])
+            obj_copy['timestamp'] = datetime.fromisoformat(
+                obj_copy['timestamp'])
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -136,7 +147,7 @@ class RequestBuilder:
         protocol = RequestBuilder.validate_protocol(parsed_url.scheme)
 
         # Path and pathname
-        pathname = parsed_url.path
+        pathname = parsed_url.path or "/"
         path = path_from_url(url)
 
         # Query string
@@ -193,7 +204,8 @@ class ResponseBuilder:
             obj_copy['bodyAsJson'] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = datetime.fromisoformat(obj_copy['timestamp'])
+            obj_copy['timestamp'] = datetime.fromisoformat(
+                obj_copy['timestamp'])
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)
@@ -307,5 +319,6 @@ class HttpExchangeWriter:
         Arguments:
             exchange: {HttpExchange} -- The exchange to write.
         """
-        json.dump(delete_none_entries(exchange), self.output, default=json_serial)
+        json.dump(delete_none_entries(exchange),
+                  self.output, default=json_serial)
         self.output.write("\n")
