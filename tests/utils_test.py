@@ -1,10 +1,10 @@
 from http_types.utils import RequestBuilder
-from datetime import datetime
 from io import StringIO
 from os import path
 import os
 import json
 from http_types import HttpExchange, HttpExchangeBuilder, HttpExchangeReader, HttpExchangeWriter
+from dateutil.parser import isoparse
 from typeguard import check_type  # type: ignore
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -72,9 +72,9 @@ def test_from_url_with_root_path():
 def test_from_json():
     with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
         exchange = HttpExchangeReader.from_json(f.read())
-        assert exchange['request']['timestamp'] == datetime.fromisoformat(
+        assert exchange['request']['timestamp'] == isoparse(
             "2018-11-13T20:20:39+02:00")
-        assert exchange['response']['timestamp'] == datetime.fromisoformat(
+        assert exchange['response']['timestamp'] == isoparse(
             "2020-01-31T13:34:15")
 
 
@@ -85,7 +85,7 @@ def test_invalid_timestamp_in_json():
             HttpExchangeReader.from_json(json_string)
             raise AssertionError("No exception raised from invalid timestamp")
         except ValueError as e:
-            assert str(e).startswith("Invalid isoformat string")
+            assert str(e) == "Invalid isoformat string: INVALID_STRING"
 
 
 def test_from_jsonl():
