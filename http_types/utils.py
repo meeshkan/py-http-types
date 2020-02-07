@@ -77,6 +77,15 @@ def delete_none_entries(d):
     return result
 
 
+def parse_iso860_datetime(input_string: str) -> datetime:
+    try:
+        return isoparse(input_string)
+    except ValueError:
+        # The error message from isoparse() is not informative,
+        # so we provide our own:
+        raise ValueError("Invalid isoformat string: " + input_string)
+
+
 class RequestBuilder:
     def __init__(self):
         raise Exception("Do not instantiate")
@@ -112,13 +121,7 @@ class RequestBuilder:
             obj_copy['bodyAsJson'] = body_as_json
 
         if "timestamp" in obj_copy:
-            string_format = obj_copy['timestamp']
-            try:
-                obj_copy['timestamp'] = isoparse(string_format)
-            except ValueError:
-                # The error message from isoparse() is not informative,
-                # so we provide our own:
-                raise ValueError("Invalid isoformat string: INVALID_STRING")
+            obj_copy['timestamp'] = parse_iso860_datetime(obj_copy['timestamp'])
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -206,8 +209,7 @@ class ResponseBuilder:
             obj_copy['bodyAsJson'] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = isoparse(
-                obj_copy['timestamp'])
+            obj_copy['timestamp'] = parse_iso860_datetime(obj_copy['timestamp'])
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)
