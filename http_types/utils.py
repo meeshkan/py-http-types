@@ -85,6 +85,17 @@ def parse_iso860_datetime(input_string: str) -> datetime:
         # so we provide our own:
         raise ValueError("Invalid isoformat string: " + input_string)
 
+        
+def url_encode_params(params: Dict):
+    """Wrapper around urlencode() that handles multi-valued (mapped to an array) parameters."""
+    params_list = []
+    for key, value in params.items():
+        if isinstance(value, list):
+            params_list.extend([(key, x) for x in value])
+        else:
+            params_list.append((key, value))
+    return urlencode(params_list)
+
 
 class RequestBuilder:
     def __init__(self):
@@ -103,7 +114,7 @@ class RequestBuilder:
                 raise Exception("One of 'path' or 'pathname' is required")
             path = obj_copy["pathname"]
             if "query" in obj_copy:
-                path += "?" + urlencode(obj_copy["query"])
+                path += "?" + url_encode_params(obj_copy["query"])
             obj_copy['path'] = path
 
         if "pathname" not in obj_copy:

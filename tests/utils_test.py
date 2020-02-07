@@ -31,8 +31,8 @@ def test_request_from_dict():
         'host': 'api.github.com',
         'protocol': 'https',
         'method': 'get',
-        'path': '/v1/users',
-        'query': {}
+        'pathname': '/v1/users',
+        'query': {'a': 'b', 'q': ['1', '2']}
     }
     req = RequestBuilder.from_dict(dict_req)
     assert req['method'] == "get"
@@ -40,6 +40,8 @@ def test_request_from_dict():
     assert req['protocol'] == "https"
     assert req['body'] == ''
     assert req['headers'] == {}
+    assert req['pathname'] == '/v1/users'
+    assert req['path'] == '/v1/users?a=b&q=1&q=2'
 
 
 def test_from_url():
