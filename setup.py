@@ -17,7 +17,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 REQUIRED = [
-    'python-dateutil',
+    'python-dateutil>=2.8.1',
     'typing-extensions',
     'typeguard>=2.7.0'
 ]
@@ -34,7 +34,7 @@ DEV = [
     'pyhamcrest'
 ]
 
-VERSION = '0.0.6'
+VERSION = '0.0.7'
 
 # Optional packages
 EXTRAS = {'dev': DEV}
