@@ -39,7 +39,7 @@ def parse_pathname(path: str) -> str:
     return urlparse(path).path
 
 
-path_capture = re.compile(r"^https?:\/\/[a-zA-Z\.]+(\/(?:\S)*)?$")
+path_capture = re.compile(r"^https?:\/\/[^\/]+(\/(?:\S)*)?$")
 
 
 def path_from_url(url: str) -> str:
