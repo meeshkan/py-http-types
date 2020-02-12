@@ -41,3 +41,5 @@ jobs: # A basic unit of work in a run
             export VENV_HOME_DIR=$(pipenv --venv)
             source $VENV_HOME_DIR/bin/activate
             pyright --lib
+      - run: black --check .
+      - run: flake8 --exclude .git,.venv,__pycache__,build,dist

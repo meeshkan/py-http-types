@@ -3,11 +3,25 @@ from datetime import datetime
 from typing import Any, cast, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import isoparse
-from http_types.types import HttpMethod, Protocol, HttpExchange, Request, Response, Headers, Query
+from http_types.types import (
+    HttpMethod,
+    Protocol,
+    HttpExchange,
+    Request,
+    Response,
+    Headers,
+    Query,
+)
 import re
 
-__all__ = ["RequestBuilder", "ResponseBuilder",
-           "HttpExchangeBuilder", "HttpExchangeReader", "HttpExchangeWriter"]
+__all__ = [
+    "RequestBuilder",
+    "ResponseBuilder",
+    "HttpExchangeBuilder",
+    "HttpExchangeReader",
+    "HttpExchangeWriter",
+]
+
 
 class BuilderException(Exception):
     pass
@@ -17,7 +31,7 @@ def parse_body(body: str) -> Any:
     # TODO Handle errors for non-json
     try:
         return json.loads(body)
-    except:
+    except json.JSONDecodeError:
         # TODO Typeguard does not accept missing arguments so return empty string for now
         return ""
 
@@ -70,7 +84,7 @@ def parse_qs_flattening(query_string: str) -> Query:
 def delete_none_entries(d):
     result = d.copy()
     for key, value in d.items():
-        if value is None or value == '':
+        if value is None or value == "":
             del result[key]
         elif isinstance(value, dict):
             result[key] = delete_none_entries(value)
@@ -85,7 +99,7 @@ def parse_iso860_datetime(input_string: str) -> datetime:
         # so we provide our own:
         raise ValueError("Invalid isoformat string: " + input_string)
 
-        
+
 def url_encode_params(params: Dict):
     """Wrapper around urlencode() that handles multi-valued (mapped to an array) parameters."""
     params_list = []
@@ -107,7 +121,7 @@ class RequestBuilder:
 
         if "query" not in obj_copy and "path" in obj_copy:
             query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)
-            obj_copy['query'] = query_dict
+            obj_copy["query"] = query_dict
 
         if "path" not in obj_copy:
             if "pathname" not in obj_copy:
@@ -115,24 +129,24 @@ class RequestBuilder:
             path = obj_copy["pathname"]
             if "query" in obj_copy:
                 path += "?" + url_encode_params(obj_copy["query"])
-            obj_copy['path'] = path
+            obj_copy["path"] = path
 
         if "pathname" not in obj_copy:
-            path = obj_copy['path']
-            obj_copy['pathname'] = parse_pathname(path)
+            path = obj_copy["path"]
+            obj_copy["pathname"] = parse_pathname(path)
 
         if "body" not in obj_copy:
-            obj_copy['body'] = ""
+            obj_copy["body"] = ""
 
         if "headers" not in obj_copy:
-            obj_copy['headers'] = {}
+            obj_copy["headers"] = {}
 
         if "bodyAsJson" not in obj_copy:
-            body_as_json = parse_body(obj_copy['body'])
-            obj_copy['bodyAsJson'] = body_as_json
+            body_as_json = parse_body(obj_copy["body"])
+            obj_copy["bodyAsJson"] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = parse_iso860_datetime(obj_copy['timestamp'])
+            obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -140,12 +154,14 @@ class RequestBuilder:
 
     @staticmethod
     def validate_protocol(proto: str) -> Protocol:
-        if not proto in ["http", "https"]:
+        if proto not in ["http", "https"]:
             raise BuilderException("")
         return cast(Protocol, proto)
 
     @staticmethod
-    def from_url(url: str, method: HttpMethod = "get", headers: Headers = {}) -> Request:
+    def from_url(
+        url: str, method: HttpMethod = "get", headers: Headers = {}
+    ) -> Request:
         """Parse Request object from url.
 
         Arguments:
@@ -173,15 +189,17 @@ class RequestBuilder:
 
         host = parsed_url.netloc
 
-        req = Request(method=method,
-                      protocol=protocol,
-                      host=host,
-                      body="",
-                      bodyAsJson="",
-                      path=path,
-                      pathname=pathname,
-                      query=query,
-                      headers=headers)
+        req = Request(
+            method=method,
+            protocol=protocol,
+            host=host,
+            body="",
+            bodyAsJson="",
+            path=path,
+            pathname=pathname,
+            query=query,
+            headers=headers,
+        )
         RequestBuilder.validate(req)
         return req
 
@@ -192,19 +210,21 @@ class RequestBuilder:
         Arguments:
             request {Request} -- Possible request object.
         """
-        method = request['method']
+        method = request["method"]
         # typeguard does not support checking Literal from typing-extensions,
         # so check it by hand
         # https://github.com/agronholm/typeguard/issues/64
-        assert method in ['get',
-                          'put',
-                          'post',
-                          'patch',
-                          'delete',
-                          'options',
-                          'trace',
-                          'head',
-                          'connect']
+        assert method in [
+            "get",
+            "put",
+            "post",
+            "patch",
+            "delete",
+            "options",
+            "trace",
+            "head",
+            "connect",
+        ]
 
 
 class ResponseBuilder:
@@ -216,11 +236,11 @@ class ResponseBuilder:
         obj_copy = dict(**obj)
 
         if "bodyAsJson" not in obj_copy:
-            body_as_json = parse_body(obj_copy['body'])
-            obj_copy['bodyAsJson'] = body_as_json
+            body_as_json = parse_body(obj_copy["body"])
+            obj_copy["bodyAsJson"] = body_as_json
 
         if "timestamp" in obj_copy:
-            obj_copy['timestamp'] = parse_iso860_datetime(obj_copy['timestamp'])
+            obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)
@@ -256,16 +276,16 @@ class HttpExchangeBuilder:
         Returns:
             HttpExchange -- Request-response pair.
         """
-        if 'request' not in obj:
+        if "request" not in obj:
             raise BuilderException("Missing request")
 
-        if 'response' not in obj:
+        if "response" not in obj:
             raise BuilderException("Missing response")
 
-        req_obj = obj['request']
+        req_obj = obj["request"]
         req = RequestBuilder.from_dict(req_obj)
 
-        res_obj = obj['response']
+        res_obj = obj["response"]
         res = ResponseBuilder.from_dict(res_obj)
 
         reqres = HttpExchange(request=req, response=res)
@@ -283,7 +303,6 @@ class HttpExchangeBuilder:
 
 
 class HttpExchangeReader:
-
     def __init__(self):
         raise Exception("Do not instantiate")
 
@@ -316,7 +335,6 @@ def json_serial(obj):
 
 
 class HttpExchangeWriter:
-
     def __init__(self, output: IO[str]):
         """Create a writer of HTTP exchanges.
 
@@ -334,6 +352,5 @@ class HttpExchangeWriter:
         Arguments:
             exchange: {HttpExchange} -- The exchange to write.
         """
-        json.dump(delete_none_entries(exchange),
-                  self.output, default=json_serial)
+        json.dump(delete_none_entries(exchange), self.output, default=json_serial)
         self.output.write("\n")

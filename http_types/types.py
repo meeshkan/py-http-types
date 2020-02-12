@@ -15,20 +15,14 @@ Query = Mapping[str, Union[str, Sequence[str]]]
 """
 HTTP request protocol.
 """
-Protocol = Literal['http', 'https']
+Protocol = Literal["http", "https"]
 
 """
 HTTP method.
 """
-HttpMethod = Literal['get',
-                     'put',
-                     'post',
-                     'patch',
-                     'delete',
-                     'options',
-                     'trace',
-                     'head',
-                     'connect']
+HttpMethod = Literal[
+    "get", "put", "post", "patch", "delete", "options", "trace", "head", "connect"
+]
 
 
 class _Request(TypedDict, total=False):
@@ -132,9 +126,17 @@ class HttpExchange(TypedDict, total=True):
     """
     HTTP request-response pair.
     """
+
     request: Request
     response: Response
 
 
-__all__ = ["Request", "Response", "HttpExchange",
-           "Headers", "Query", "Protocol", "HttpMethod"]
+__all__ = [
+    "Request",
+    "Response",
+    "HttpExchange",
+    "Headers",
+    "Query",
+    "Protocol",
+    "HttpMethod",
+]
