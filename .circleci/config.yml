@@ -18,7 +18,7 @@ jobs: # A basic unit of work in a run
       - run:
           command: |
             sudo pip install pipenv
-            pipenv install -e .[dev]
+            pipenv install --pre -e .[dev]
             pipenv update
       - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
@@ -27,19 +27,17 @@ jobs: # A basic unit of work in a run
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
       - run:
-          command: |
-            export VENV_HOME_DIR=$(pipenv --venv)
-            source $VENV_HOME_DIR/bin/activate
-            pytest -s
+          name: Run check for black formatting
+          command: black --check .
       - run:
-          name: Install pyright and run typecheck
+          name: Install pyright
           command: |
             set +e
             echo 'export PATH=$(yarn global bin):$PATH' >> $BASH_ENV
             source $BASH_ENV
             yarn global add pyright
+      - run:
+          command: |
             export VENV_HOME_DIR=$(pipenv --venv)
             source $VENV_HOME_DIR/bin/activate
-            pyright --lib
-      - run: black --check .
-      - run: flake8 --exclude .git,.venv,__pycache__,build,dist
+            python setup.py test

@@ -105,10 +105,25 @@ class TestCommand(SetupCommand):
     description = "Run local test if they exist"
 
     def run(self):
+        self.status("Formatting code with black...")
+        exit_code = os.system("black .")
+        if exit_code != 0:
+            raise errors.DistutilsError("Formatting with black failed.")
+
+        self.status("Running pytest...")
         exit_code = os.system("pytest")
-        self.status("Tests exited with code: {code}".format(code=exit_code))
         if exit_code != 0:
             raise errors.DistutilsError("Tests failed.")
+
+        self.status("Running type-checking...")
+        exit_code = type_check()
+        if exit_code != 0:
+            raise errors.DistutilsError("Type-checking failed.")
+
+        self.status("Running flake8...")
+        exit_code = os.system("flake8 --exclude .git,.venv,__pycache__,build,dist")
+        if exit_code != 0:
+            raise errors.DistutilsError(" failed.")
 
 
 class UploadCommand(SetupCommand):
