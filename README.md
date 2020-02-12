@@ -77,22 +77,16 @@ ResponseBuilder.validate(res)  # Validate `Response` object
 
 1. Create a new virtual environment.
 1. Install dependencies: `pip install --upgrade -e '.[dev]'`
+1. Install [pyright](https://github.com/microsoft/pyright).
 
 ### Running tests
 
-Run `pytest tests/` or `python setup.py test`.
+Run `python setup.py test`, which will:
 
-Configuration for `pytest` is found in [pytest.ini](./pytest.ini) file.
-
-### Running type-checking
-
-Install [pyright](https://github.com/microsoft/pyright) and run `pyright --lib` or `python setup.py typecheck`.
-
-Configuration for `pyright` is found in [pyrightconfig.json](./pyrightconfig.json) file.
-
-### Automated tests
-
-See [.circleci/config.yml](./.circleci/config.yml).
+- Enforce code formatting using [black](https://black.readthedocs.io/en/stable/).
+- Test with `pytest`, configured in [pytest.ini](./pytest.ini).
+- Type check with `pyright`, configured in [pyrightconfig.json](./pyrightconfig.json).
+- Enforce style guide with [flake8](https://flake8.pycqa.org/en/latest/), configured in [.flake8](./.flake8).
 
 ### Publishing package
 
