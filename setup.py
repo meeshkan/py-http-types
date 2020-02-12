@@ -4,44 +4,43 @@ import os
 import sys
 
 # Package meta-data.
-NAME = 'http-types'
-DESCRIPTION = 'Types for HTTP requests and responses'
-URL = 'http://github.com/Meeshkan/py-http-types'
-EMAIL = 'dev@meeshkan.com'
-AUTHOR = 'Meeshkan Dev Team'
-REQUIRES_PYTHON = '>=3.6.0'
+NAME = "http-types"
+DESCRIPTION = "Types for HTTP requests and responses"
+URL = "http://github.com/Meeshkan/py-http-types"
+EMAIL = "dev@meeshkan.com"
+AUTHOR = "Meeshkan Dev Team"
+REQUIRES_PYTHON = ">=3.6.0"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = '\n' + f.read()
+with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+    long_description = "\n" + f.read()
 
-REQUIRED = [
-    'python-dateutil>=2.8.1',
-    'typing-extensions',
-    'typeguard>=2.7.0'
-]
+REQUIRED = ["python-dateutil>=2.8.1", "typing-extensions", "typeguard>=2.7.0"]
 
 DEV = [
-    'pytest',
-    'pylint',
-    'autopep8',
-    'setuptools',
-    'twine',
-    'wheel',
-    'pytest-watch',
-    'pytest-testmon',
-    'pyhamcrest'
+    "autopep8",
+    "black",
+    "flake8",
+    "pyhamcrest",
+    "pylint",
+    "pytest",
+    "pytest-testmon",
+    "pytest-watch",
+    "setuptools",
+    "twine",
+    "wheel",
 ]
 
-VERSION = '0.0.7'
+VERSION = "0.0.7"
 
 # Optional packages
-EXTRAS = {'dev': DEV}
+EXTRAS = {"dev": DEV}
 
 
 class SetupCommand(Command):
     """Base class for setup.py commands with no arguments"""
+
     user_options = []
 
     def initialize_options(self):
@@ -53,7 +52,7 @@ class SetupCommand(Command):
     @staticmethod
     def status(s):
         """Prints things in bold."""
-        print('\033[1m{0}\033[0m'.format(s))
+        print("\033[1m{0}\033[0m".format(s))
 
     def rmdir_if_exists(self, directory):
         self.status("Deleting {}".format(directory))
@@ -62,7 +61,10 @@ class SetupCommand(Command):
 
 def build():
     return os.system(
-        "{executable} setup.py sdist bdist_wheel --universal".format(executable=sys.executable))
+        "{executable} setup.py sdist bdist_wheel --universal".format(
+            executable=sys.executable
+        )
+    )
 
 
 def type_check():
@@ -71,11 +73,12 @@ def type_check():
 
 class BuildDistCommand(SetupCommand):
     """Support setup.py upload."""
+
     description = "Build the package."
 
     def run(self):
         self.status("Removing previous builds...")
-        self.rmdir_if_exists(os.path.join(here, 'dist'))
+        self.rmdir_if_exists(os.path.join(here, "dist"))
 
         self.status("Building Source and Wheel (universal) distribution...")
         exit_code = build()
@@ -86,36 +89,52 @@ class BuildDistCommand(SetupCommand):
 
 class TypeCheckCommand(SetupCommand):
     """Run type-checking."""
+
     description = "Run type-checking."
 
     def run(self):
         exit_code = type_check()
-        self.status(
-            "Typecheck exited with code: {code}".format(code=exit_code))
+        self.status("Typecheck exited with code: {code}".format(code=exit_code))
         if exit_code != 0:
             raise errors.DistutilsError("Type-checking failed.")
 
 
 class TestCommand(SetupCommand):
     """Support setup.py test."""
+
     description = "Run local test if they exist"
 
     def run(self):
+        self.status("Formatting code with black...")
+        exit_code = os.system("black .")
+        if exit_code != 0:
+            raise errors.DistutilsError("Formatting with black failed.")
+
+        self.status("Running pytest...")
         exit_code = os.system("pytest")
-        self.status(
-            "Tests exited with code: {code}".format(code=exit_code))
         if exit_code != 0:
             raise errors.DistutilsError("Tests failed.")
+
+        self.status("Running type-checking...")
+        exit_code = type_check()
+        if exit_code != 0:
+            raise errors.DistutilsError("Type-checking failed.")
+
+        self.status("Running flake8...")
+        exit_code = os.system("flake8 --exclude .git,.venv,__pycache__,build,dist")
+        if exit_code != 0:
+            raise errors.DistutilsError(" failed.")
 
 
 class UploadCommand(SetupCommand):
     """Support setup.py upload."""
+
     description = "Build and publish the package."
 
     def run(self):
 
         self.status("Removing previous builds...")
-        self.rmdir_if_exists(os.path.join(here, 'dist'))
+        self.rmdir_if_exists(os.path.join(here, "dist"))
 
         self.status("Building Source and Wheel (universal) distribution...")
         exit_code = build()
@@ -131,28 +150,31 @@ class UploadCommand(SetupCommand):
         sys.exit()
 
 
-setup(name=NAME,
-      version=VERSION,
-      description=DESCRIPTION,
-      long_description=long_description,
-      long_description_content_type='text/markdown',
-      url=URL,
-      author=AUTHOR,
-      author_email=EMAIL,
-      python_requires=REQUIRES_PYTHON,
-      license='MIT',
-      packages=find_packages(exclude=["tests"]),
-      include_package_data=True,
-      install_requires=REQUIRED,
-      extras_require=EXTRAS,
-      classifiers=[
-          'Programming Language :: Python :: 3',
-          'License :: OSI Approved :: MIT License',
-          'Operating System :: OS Independent',
-      ],
-      zip_safe=False,
-      cmdclass={'dist': BuildDistCommand,
-                'test': TestCommand,
-                'typecheck': TypeCheckCommand,
-                'upload': UploadCommand}
-      )
+setup(
+    name=NAME,
+    version=VERSION,
+    description=DESCRIPTION,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url=URL,
+    author=AUTHOR,
+    author_email=EMAIL,
+    python_requires=REQUIRES_PYTHON,
+    license="MIT",
+    packages=find_packages(exclude=["tests"]),
+    include_package_data=True,
+    install_requires=REQUIRED,
+    extras_require=EXTRAS,
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    zip_safe=False,
+    cmdclass={
+        "dist": BuildDistCommand,
+        "test": TestCommand,
+        "typecheck": TypeCheckCommand,
+        "upload": UploadCommand,
+    },
+)
