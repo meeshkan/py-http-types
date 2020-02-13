@@ -81,13 +81,14 @@ def parse_qs_flattening(query_string: str) -> Query:
     return query_dict
 
 
-def delete_none_entries(d):
-    result = d.copy()
-    for key, value in d.items():
-        if value is None or value == "":
+def delete_entries_for_serialization(data_to_be_serialized):
+    """Delete entries that are not to be serialized to JSON."""
+    result = data_to_be_serialized.copy()
+    for key, value in data_to_be_serialized.items():
+        if key == "bodyAsJson" or value is None or value == "":
             del result[key]
         elif isinstance(value, dict):
-            result[key] = delete_none_entries(value)
+            result[key] = delete_entries_for_serialization(value)
     return result
 
 
@@ -352,5 +353,7 @@ class HttpExchangeWriter:
         Arguments:
             exchange: {HttpExchange} -- The exchange to write.
         """
-        json.dump(delete_none_entries(exchange), self.output, default=json_serial)
+        json.dump(
+            delete_entries_for_serialization(exchange), self.output, default=json_serial
+        )
         self.output.write("\n")

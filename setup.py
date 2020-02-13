@@ -22,6 +22,7 @@ DEV = [
     "autopep8",
     "black",
     "flake8",
+    "jsonschema",
     "pyhamcrest",
     "pylint",
     "pytest",

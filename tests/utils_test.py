@@ -10,15 +10,23 @@ from http_types import (
     HttpExchangeWriter,
 )
 from dateutil.parser import isoparse
+import jsonschema
 from typeguard import check_type  # type: ignore
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 SAMPLE_JSON = path.join(dir_path, "resources", "sample.json")
 SAMPLE_JSONL = path.join(dir_path, "resources", "sample.jsonl")
+SCHEMA_PATH = path.join(dir_path, "resources", "http-types-schema.json")
 
 
 def read_example():
     with open(SAMPLE_JSON) as f:
+        content = f.read()
+        return json.loads(content)
+
+
+def read_schema():
+    with open(SCHEMA_PATH) as f:
         content = f.read()
         return json.loads(content)
 
@@ -121,6 +129,11 @@ def test_writing_json():
         for exchange in HttpExchangeReader.from_jsonl(f):
             original_exchanges.append(exchange)
             writer.write(exchange)
+
+    buffer.seek(0)
+    schema = read_schema()
+    for line in buffer:
+        jsonschema.validate(instance=json.loads(line), schema=schema)
 
     buffer.seek(0)
     exchanges = list(HttpExchangeReader.from_jsonl(buffer))
