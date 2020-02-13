@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://meeshkan.com/http-request-response.json",
+  "type": "object",
+  "title": "HttpExchange",
+  "description": "A HTTP request and response pair.",
+  "required": [ "request" ],
+  "properties": {
+    "request": {
+      "title": "HttpRequest",
+      "description": "A HTTP request.",
+      "type": "object",
+      "required": ["protocol", "method", "headers", "host"],
+      "properties": {
+        "method": {
+          "title": "HttpMethod",
+          "description": "The HTTP method of a request.",
+          "type": "string",
+          "enum": ["get", "put", "post", "patch", "delete", "options", "trace", "head", "connect"]
+        },
+        "protocol": {
+          "title": "HttpProtocol",
+          "description": "The protocol of the request, either unencrypted http or encrypted https.",
+          "type": "string",
+          "enum": ["http", "https"]
+        },
+        "host": {
+          "title": "HttpHost",
+          "description": "The hostname and optional port, as in '$HOSTNAME[:$PORT]'.",
+          "type": "string"
+        },
+        "path": {
+          "description": "Path name and query parameters, as in '/a/path?q=v'. This duplicates the information in 'pathname' and 'query', so should not be present at the same time.",
+          "type": "string"
+        },
+        "pathname": {
+          "description": "Path name without query parameters, as in '/a/path'. This duplicates the information in 'path', so should not be present at the same time.",
+          "type": "string"
+        },
+        "query": {
+          "type": "object",
+          "required": [],
+          "additionalProperties": {
+              "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+          }
+        },
+        "headers": {
+          "type": "object",
+          "required": [],
+          "additionalProperties": {
+              "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+          }
+        },
+        "body": {
+          "title": "HttpRequestBody",
+          "description": "The request body string.",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "HttpRequestTimestamp",
+          "description": "The time at which the HTTP request was initiated in ISO 8601 format, as in '2018-11-13T20:20:39+00:00'.",
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "response": {
+      "title": "HttpResponse",
+      "description": "A HTTP response.",
+      "type": "object",
+      "required": [ "statusCode" ],
+      "properties": {
+        "statusCode": {
+          "type": "number"
+        },
+        "body": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object",
+          "required": [],
+          "additionalProperties": {
+              "anyOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+          }
+        },
+        "timestamp": {
+          "title": "HttpResponseTimestamp",
+          "description": "The time at which the HTTP response was completed on the server side in ISO 8601 format, as in '2018-11-13T20:20:39+00:00'.",
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
