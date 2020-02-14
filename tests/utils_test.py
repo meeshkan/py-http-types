@@ -1,4 +1,4 @@
-from http_types.utils import RequestBuilder
+from http_types.utils import ResponseBuilder, RequestBuilder
 from io import StringIO
 from os import path
 import os
@@ -126,3 +126,37 @@ def test_writing_json():
     exchanges = list(HttpExchangeReader.from_jsonl(buffer))
     validate_sample_exchanges(exchanges)
     assert original_exchanges == exchanges
+
+
+def test_example_from_readme():
+    request = RequestBuilder.from_dict(
+        {
+            "host": "api.github.com",
+            "protocol": "https",
+            "method": "get",
+            "pathname": "/v1/users",
+            "query": {"a": "b", "q": ["1", "2"]},
+        }
+    )
+
+    response = ResponseBuilder.from_dict(
+        {
+            "statusCode": 200,
+            "headers": {"content-type": "text/plain"},
+            "body": "(response body string)",
+        }
+    )
+
+    exchange = HttpExchange(request=request, response=response)
+
+    output_file = StringIO()
+    writer = HttpExchangeWriter(output_file)
+    writer.write(exchange)
+
+    input_file = output_file
+    input_file.seek(0)
+
+    for exchange in HttpExchangeReader.from_jsonl(input_file):
+        assert exchange["request"]["method"] == "get"
+        assert exchange["request"]["protocol"] == "https"
+        assert exchange["response"]["statusCode"] == 200
