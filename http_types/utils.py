@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Any, cast, Dict, Generator, IO, Union
+from typing import Any, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import isoparse
 import copy
@@ -173,7 +173,7 @@ class RequestBuilder:
     def validate_protocol(proto: str) -> Protocol:
         if proto not in ["http", "https"]:
             raise BuilderException("")
-        return cast(Protocol, proto)
+        return Protocol(proto)
 
     @staticmethod
     def from_url(

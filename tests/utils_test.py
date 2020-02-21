@@ -58,12 +58,17 @@ def test_request_from_dict():
     assert req.path == "/v1/users?a=b&q=1&q=2"
 
 
+def test_validate_protocol():
+    assert RequestBuilder.validate_protocol("http") == Protocol.HTTP
+    assert RequestBuilder.validate_protocol("https") == Protocol.HTTPS
+
+
 def test_from_url():
     test_url = "https://api.github.com/v1/repos?id=1&q=v1&q=v2"
     req = RequestBuilder.from_url(test_url)
     assert req.method == HttpMethod.GET
     assert req.host == "api.github.com"
-    assert req.protocol == "https"
+    assert req.protocol == Protocol.HTTPS
     assert req.path == "/v1/repos?id=1&q=v1&q=v2"
     assert req.pathname == "/v1/repos"
     assert req.query == {"id": "1", "q": ["v1", "v2"]}
