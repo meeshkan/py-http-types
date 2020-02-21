@@ -44,9 +44,9 @@ With `HttpExchangeReader` recordings in the HTTP Types format can be read for pr
 
 ```python
 for exchange in HttpExchangeReader.from_jsonl(input_file):
-    assert exchange["request"]["method"] == "get"
-    assert exchange["request"]["protocol"] == "https"
-    assert exchange["response"]["statusCode"] == 200
+    assert exchange.request.method == HttpMethod.GET
+    assert exchange.request.protocol == Protocol.HTTPS
+    assert exchange.response.statusCode == 200
 ```
 
 ## Development
