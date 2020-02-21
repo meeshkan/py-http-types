@@ -1,6 +1,7 @@
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Union, Mapping, Sequence
-from typing_extensions import Literal, TypedDict
+from typing import Any, Union, Mapping, Sequence, Optional
+import enum
 
 """
 HTTP request or response headers. Array-valued header values can be represented with a comma-separated string.
@@ -15,36 +16,45 @@ Query = Mapping[str, Union[str, Sequence[str]]]
 """
 HTTP request protocol.
 """
-Protocol = Literal["http", "https"]
+
+
+class Protocol(enum.Enum):
+    HTTP = "http"
+    HTTPS = "https"
+
 
 """
 HTTP method.
 """
-HttpMethod = Literal[
-    "get", "put", "post", "patch", "delete", "options", "trace", "head", "connect"
-]
 
 
-class _Request(TypedDict, total=False):
+class HttpMethod(enum.Enum):
+    GET = "get"
+    PUT = "put"
+    POST = "post"
+    PATCH = "patch"
+    DELETE = "delete"
+    OPTIONS = "options"
+    TRACE = "trace"
+    HEAD = "head"
+    CONNECT = "connect"
+
+
+@dataclass
+class Request:
     """
-    Optional fields for Request.
+    HTTP request.
     """
 
     """
     HTTP request body as JSON. Could be dictionary, list, or string.
     """
-    bodyAsJson: Any
+    bodyAsJson: Optional[Any]
 
     """
     Timestamp when the request was initiated.
     """
-    timestamp: datetime
-
-
-class Request(_Request, total=True):
-    """
-    HTTP request.
-    """
+    timestamp: Optional[datetime]
 
     """
     Request method.
@@ -89,26 +99,21 @@ class Request(_Request, total=True):
     protocol: Protocol
 
 
-class _Response(TypedDict, total=False):
+@dataclass
+class Response:
     """
-    Optional fields for Response.
+    HTTP response.
     """
 
     """
     Response body as JSON. Could be dictionary, list, or string.
     """
-    bodyAsJson: Any
+    bodyAsJson: Optional[Any]
 
     """
     Timestamp when the response was sent.
     """
-    timestamp: datetime
-
-
-class Response(_Response, total=True):
-    """
-    HTTP response.
-    """
+    timestamp: Optional[datetime]
 
     """
     Response body.
@@ -122,7 +127,8 @@ class Response(_Response, total=True):
     headers: Headers
 
 
-class HttpExchange(TypedDict, total=True):
+@dataclass
+class HttpExchange:
     """
     HTTP request-response pair.
     """
