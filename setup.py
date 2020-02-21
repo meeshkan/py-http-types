@@ -33,7 +33,7 @@ DEV = [
     "wheel",
 ]
 
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 
 # Optional packages
 EXTRAS = {"dev": DEV}
