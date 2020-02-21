@@ -6,8 +6,6 @@ from dateutil.parser import isoparse
 import copy
 from dataclasses import asdict, is_dataclass
 from http_types.types import (
-    METHOD_STR_TO_ENUM,
-    PROTOCOL_STR_TO_ENUM,
     HttpMethod,
     Protocol,
     HttpExchange,
@@ -133,8 +131,8 @@ class RequestBuilder:
     def from_dict(obj: Dict) -> Request:
         obj_copy = dict(**obj)
 
-        obj_copy["method"] = METHOD_STR_TO_ENUM[obj_copy["method"]]
-        obj_copy["protocol"] = PROTOCOL_STR_TO_ENUM[obj_copy["protocol"]]
+        obj_copy["method"] = HttpMethod(obj_copy["method"])
+        obj_copy["protocol"] = Protocol(obj_copy["protocol"])
 
         if "query" not in obj_copy and "path" in obj_copy:
             query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)

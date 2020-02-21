@@ -23,8 +23,6 @@ class Protocol(enum.Enum):
     HTTPS = "https"
 
 
-PROTOCOL_STR_TO_ENUM = {"http": Protocol.HTTP, "https": Protocol.HTTPS}
-
 """
 HTTP method.
 """
@@ -40,19 +38,6 @@ class HttpMethod(enum.Enum):
     TRACE = "trace"
     HEAD = "head"
     CONNECT = "connect"
-
-
-METHOD_STR_TO_ENUM = {
-    "get": HttpMethod.GET,
-    "put": HttpMethod.PUT,
-    "post": HttpMethod.POST,
-    "patch": HttpMethod.PATCH,
-    "delete": HttpMethod.DELETE,
-    "options": HttpMethod.OPTIONS,
-    "trace": HttpMethod.TRACE,
-    "head": HttpMethod.HEAD,
-    "connect": HttpMethod.CONNECT,
-}
 
 
 @dataclass
