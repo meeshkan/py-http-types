@@ -1,13 +1,14 @@
+from http_types.types import HttpMethod, Protocol
 from http_types import Request, Response
 from typeguard import check_type  # type:ignore
 from datetime import datetime
 
 req = Request(
-    method="get",
+    method=HttpMethod.GET,
     host="api.github.com",
     path="/user/repos?id=1",
     pathname="/user/repos",
-    protocol="https",
+    protocol=Protocol.HTTPS,
     query={"id": ["1"]},
     body="",
     bodyAsJson="",

@@ -1,3 +1,4 @@
+from http_types.types import HttpMethod, Protocol
 from http_types.utils import ResponseBuilder, RequestBuilder
 from io import StringIO
 from os import path
@@ -48,45 +49,45 @@ def test_request_from_dict():
         "query": {"a": "b", "q": ["1", "2"]},
     }
     req = RequestBuilder.from_dict(dict_req)
-    assert req["method"] == "get"
-    assert req["host"] == "api.github.com"
-    assert req["protocol"] == "https"
-    assert req["body"] == ""
-    assert req["headers"] == {}
-    assert req["pathname"] == "/v1/users"
-    assert req["path"] == "/v1/users?a=b&q=1&q=2"
+    assert req.method == HttpMethod.GET
+    assert req.host == "api.github.com"
+    assert req.protocol == Protocol.HTTPS
+    assert req.body == ""
+    assert req.headers == {}
+    assert req.pathname == "/v1/users"
+    assert req.path == "/v1/users?a=b&q=1&q=2"
 
 
 def test_from_url():
     test_url = "https://api.github.com/v1/repos?id=1&q=v1&q=v2"
     req = RequestBuilder.from_url(test_url)
-    assert req["method"] == "get"
-    assert req["host"] == "api.github.com"
-    assert req["protocol"] == "https"
-    assert req["path"] == "/v1/repos?id=1&q=v1&q=v2"
-    assert req["pathname"] == "/v1/repos"
-    assert req["query"] == {"id": "1", "q": ["v1", "v2"]}
+    assert req.method == HttpMethod.GET
+    assert req.host == "api.github.com"
+    assert req.protocol == "https"
+    assert req.path == "/v1/repos?id=1&q=v1&q=v2"
+    assert req.pathname == "/v1/repos"
+    assert req.query == {"id": "1", "q": ["v1", "v2"]}
 
 
 def test_from_url_without_path():
     test_url = "https://api.github.com"
     req = RequestBuilder.from_url(test_url)
-    assert req["path"] == "/"
-    assert req["pathname"] == "/"
+    assert req.path == "/"
+    assert req.pathname == "/"
 
 
 def test_from_url_with_root_path():
     test_url = "https://api.github.com/"
     req = RequestBuilder.from_url(test_url)
-    assert req["path"] == "/"
-    assert req["pathname"] == "/"
+    assert req.path == "/"
+    assert req.pathname == "/"
 
 
 def test_from_json():
     with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
         exchange = HttpExchangeReader.from_json(f.read())
-        assert exchange["request"]["timestamp"] == isoparse("2018-11-13T20:20:39+02:00")
-        assert exchange["response"]["timestamp"] == isoparse("2020-01-31T13:34:15")
+        assert exchange.request.timestamp == isoparse("2018-11-13T20:20:39+02:00")
+        assert exchange.response.timestamp == isoparse("2020-01-31T13:34:15")
 
 
 def test_invalid_timestamp_in_json():
@@ -107,17 +108,17 @@ def test_from_jsonl():
 
 def validate_sample_exchanges(exchanges):
     assert len(exchanges) == 3
-    assert exchanges[0]["request"]["protocol"] == "http"
-    assert exchanges[1]["request"]["protocol"] == "https"
+    assert exchanges[0].request.protocol == Protocol.HTTP
+    assert exchanges[1].request.protocol == Protocol.HTTPS
 
     for exchange in exchanges[0:2]:
-        assert exchange["request"]["path"] == "/user/repos?q=v"
-        assert exchange["request"]["pathname"] == "/user/repos"
-        assert exchange["request"]["query"] == {"q": "v"}
+        assert exchange.request.path == "/user/repos?q=v"
+        assert exchange.request.pathname == "/user/repos"
+        assert exchange.request.query == {"q": "v"}
 
-    assert exchanges[2]["request"]["path"] == "/user/repos"
-    assert exchanges[2]["request"]["pathname"] == "/user/repos"
-    assert exchanges[2]["request"]["query"] == {}
+    assert exchanges[2].request.path == "/user/repos"
+    assert exchanges[2].request.pathname == "/user/repos"
+    assert exchanges[2].request.query == {}
 
 
 def test_writing_json():
@@ -170,6 +171,6 @@ def test_example_from_readme():
     input_file.seek(0)
 
     for exchange in HttpExchangeReader.from_jsonl(input_file):
-        assert exchange["request"]["method"] == "get"
-        assert exchange["request"]["protocol"] == "https"
-        assert exchange["response"]["statusCode"] == 200
+        assert exchange.request.method == HttpMethod.GET
+        assert exchange.request.protocol == Protocol.HTTPS
+        assert exchange.response.statusCode == 200

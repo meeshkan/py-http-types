@@ -3,7 +3,11 @@ from datetime import datetime
 from typing import Any, cast, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import isoparse
+import copy
+from dataclasses import asdict, is_dataclass
 from http_types.types import (
+    METHOD_STR_TO_ENUM,
+    PROTOCOL_STR_TO_ENUM,
     HttpMethod,
     Protocol,
     HttpExchange,
@@ -83,10 +87,19 @@ def parse_qs_flattening(query_string: str) -> Query:
 
 def delete_entries_for_serialization(data_to_be_serialized):
     """Delete entries that are not to be serialized to JSON."""
-    result = data_to_be_serialized.copy()
-    for key, value in data_to_be_serialized.items():
+    result = (
+        asdict(data_to_be_serialized)
+        if is_dataclass(data_to_be_serialized)
+        else copy.deepcopy(data_to_be_serialized)
+    )
+    to_iter = copy.deepcopy(result)
+    for key, value in to_iter.items():
         if key == "bodyAsJson" or value is None or value == "":
             del result[key]
+        if key == "method":
+            result[key] = result[key].value
+        if key == "protocol":
+            result[key] = result[key].value
         elif isinstance(value, dict):
             result[key] = delete_entries_for_serialization(value)
     return result
@@ -120,6 +133,9 @@ class RequestBuilder:
     def from_dict(obj: Dict) -> Request:
         obj_copy = dict(**obj)
 
+        obj_copy["method"] = METHOD_STR_TO_ENUM[obj_copy["method"]]
+        obj_copy["protocol"] = PROTOCOL_STR_TO_ENUM[obj_copy["protocol"]]
+
         if "query" not in obj_copy and "path" in obj_copy:
             query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)
             obj_copy["query"] = query_dict
@@ -148,6 +164,8 @@ class RequestBuilder:
 
         if "timestamp" in obj_copy:
             obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
+        else:
+            obj_copy["timestamp"] = None
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -161,7 +179,7 @@ class RequestBuilder:
 
     @staticmethod
     def from_url(
-        url: str, method: HttpMethod = "get", headers: Headers = {}
+        url: str, method: HttpMethod = HttpMethod.GET, headers: Headers = {}
     ) -> Request:
         """Parse Request object from url.
 
@@ -200,6 +218,7 @@ class RequestBuilder:
             pathname=pathname,
             query=query,
             headers=headers,
+            timestamp=None,
         )
         RequestBuilder.validate(req)
         return req
@@ -211,21 +230,9 @@ class RequestBuilder:
         Arguments:
             request {Request} -- Possible request object.
         """
-        method = request["method"]
-        # typeguard does not support checking Literal from typing-extensions,
-        # so check it by hand
-        # https://github.com/agronholm/typeguard/issues/64
-        assert method in [
-            "get",
-            "put",
-            "post",
-            "patch",
-            "delete",
-            "options",
-            "trace",
-            "head",
-            "connect",
-        ]
+        # No validation currently needed, safe to remove
+        # if no future validation needed
+        pass
 
 
 class ResponseBuilder:
@@ -242,6 +249,8 @@ class ResponseBuilder:
 
         if "timestamp" in obj_copy:
             obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
+        else:
+            obj_copy["timestamp"] = None
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)
