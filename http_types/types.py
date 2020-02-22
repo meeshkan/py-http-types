@@ -57,6 +57,11 @@ class Request:
     timestamp: Optional[datetime]
 
     """
+    Request body. None if no body should exit (ie GET, DELETE). Empty string if empty.
+    """
+    body: Optional[str]
+
+    """
     Request method.
     """
     method: HttpMethod
@@ -70,11 +75,6 @@ class Request:
     Query parameters.
     """
     query: Query
-
-    """
-    Request body. Empty string if empty.
-    """
-    body: str
 
     """
     Request host, possibly including port number.
