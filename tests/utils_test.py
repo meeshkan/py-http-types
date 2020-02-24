@@ -1,4 +1,4 @@
-from http_types.types import HttpMethod, Protocol, Request
+from http_types.types import HttpMethod, Protocol
 from http_types.utils import ResponseBuilder, RequestBuilder
 from io import StringIO
 from os import path
