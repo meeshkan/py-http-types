@@ -132,16 +132,24 @@ class RequestBuilder:
     @staticmethod
     def from_urllib_request(obj: request.Request) -> Request:
         parsed = urlparse(obj.full_url)
-        req = RequestBuilder.from_dict(dict(
-            method=obj.get_method().lower() if obj.get_method() is not None else "get",
-            path=parsed.path,
-            pathname=parsed.path,
-            host=parsed.netloc,
-            query=parsed.query,
-            protocol='https' if obj.full_url[:5] == 'https' else 'http',
-            body=obj.data if isinstance(obj.data , str) else obj.data.decode('utf8') if isinstance(obj.data, bytes) else None,
-            headers={ k: v for k, v in obj.header_items() }
-        ))
+        req = RequestBuilder.from_dict(
+            dict(
+                method=obj.get_method().lower()
+                if obj.get_method() is not None
+                else "get",
+                path=parsed.path,
+                pathname=parsed.path,
+                host=parsed.netloc,
+                query=parsed.query,
+                protocol="https" if obj.full_url[:5] == "https" else "http",
+                body=obj.data
+                if isinstance(obj.data, str)
+                else obj.data.decode("utf8")
+                if isinstance(obj.data, bytes)
+                else None,
+                headers={k: v for k, v in obj.header_items()},
+            )
+        )
         RequestBuilder.validate(req)
         return req
 
@@ -152,7 +160,9 @@ class RequestBuilder:
         obj_copy["method"] = HttpMethod(obj_copy["method"])
         obj_copy["protocol"] = Protocol(obj_copy["protocol"])
 
-        if (obj_copy.get("path", None) is not None) and (obj_copy.get("query", None) is None):
+        if (obj_copy.get("path", None) is not None) and (
+            obj_copy.get("query", None) is None
+        ):
             query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)
             obj_copy["query"] = query_dict
 
@@ -258,11 +268,17 @@ class ResponseBuilder:
     @staticmethod
     def from_http_client_response(obj: HTTPResponse) -> Response:
         body = obj.read()
-        res = ResponseBuilder.from_dict(dict(
-            statusCode=obj.getcode(),
-            headers={k:v for k,v in obj.getheaders()},
-            body=body if isinstance(body , str) else body.decode('utf8') if isinstance(body, bytes) else None,
-        ))
+        res = ResponseBuilder.from_dict(
+            dict(
+                statusCode=obj.getcode(),
+                headers={k: v for k, v in obj.getheaders()},
+                body=body
+                if isinstance(body, str)
+                else body.decode("utf8")
+                if isinstance(body, bytes)
+                else None,
+            )
+        )
         ResponseBuilder.validate(res)
         return res
 
