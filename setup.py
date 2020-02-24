@@ -28,6 +28,7 @@ DEV = [
     "pytest",
     "pytest-testmon",
     "pytest-watch",
+    "httpretty",
     "setuptools",
     "twine",
     "wheel",

@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from typing import Any, Dict, Generator, IO, Union
 from urllib.parse import urlencode, urlparse, parse_qs
+from http.client import HTTPResponse
 from dateutil.parser import isoparse
 import copy
 from dataclasses import asdict, is_dataclass
@@ -15,6 +16,7 @@ from http_types.types import (
     Query,
 )
 import re
+from urllib import request
 
 __all__ = [
     "RequestBuilder",
@@ -128,17 +130,43 @@ class RequestBuilder:
         raise Exception("Do not instantiate")
 
     @staticmethod
+    def from_urllib_request(obj: request.Request) -> Request:
+        parsed = urlparse(obj.full_url)
+        req = RequestBuilder.from_dict(
+            dict(
+                method=obj.get_method().lower()
+                if obj.get_method() is not None
+                else "get",
+                path=parsed.path,
+                pathname=parsed.path,
+                host=parsed.netloc,
+                query=parsed.query,
+                protocol="https" if obj.full_url[:5] == "https" else "http",
+                body=obj.data
+                if isinstance(obj.data, str)
+                else obj.data.decode("utf8")
+                if isinstance(obj.data, bytes)
+                else None,
+                headers={k: v for k, v in obj.header_items()},
+            )
+        )
+        RequestBuilder.validate(req)
+        return req
+
+    @staticmethod
     def from_dict(obj: Dict) -> Request:
         obj_copy = dict(**obj)
 
         obj_copy["method"] = HttpMethod(obj_copy["method"])
         obj_copy["protocol"] = Protocol(obj_copy["protocol"])
 
-        if "query" not in obj_copy and "path" in obj_copy:
+        if (obj_copy.get("path", None) is not None) and (
+            obj_copy.get("query", None) is None
+        ):
             query_dict = parse_qs_flattening(urlparse(obj_copy["path"]).query)
             obj_copy["query"] = query_dict
 
-        if "path" not in obj_copy:
+        if obj_copy.get("path", None) is None:
             if "pathname" not in obj_copy:
                 raise Exception("One of 'path' or 'pathname' is required")
             path = obj_copy["pathname"]
@@ -146,24 +174,24 @@ class RequestBuilder:
                 path += "?" + url_encode_params(obj_copy["query"])
             obj_copy["path"] = path
 
-        if "pathname" not in obj_copy:
+        if obj_copy.get("pathname", None) is None:
             path = obj_copy["path"]
             obj_copy["pathname"] = parse_pathname(path)
 
-        if "body" not in obj_copy:
+        if obj_copy.get("body", None) is None:
             obj_copy["body"] = ""
 
-        if "headers" not in obj_copy:
+        if obj_copy.get("headers", None) is None:
             obj_copy["headers"] = {}
 
-        if "bodyAsJson" not in obj_copy:
+        if obj_copy.get("bodyAsJson", None) is None:
             body_as_json = parse_body(obj_copy["body"])
             obj_copy["bodyAsJson"] = body_as_json
 
-        if "timestamp" in obj_copy:
-            obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
-        else:
+        if obj_copy.get("timestamp", None) is None:
             obj_copy["timestamp"] = None
+        else:
+            obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
 
         req = Request(**obj_copy)
         RequestBuilder.validate(req)
@@ -238,17 +266,34 @@ class ResponseBuilder:
         raise Exception("Do not instantiate")
 
     @staticmethod
+    def from_http_client_response(obj: HTTPResponse) -> Response:
+        body = obj.read()
+        res = ResponseBuilder.from_dict(
+            dict(
+                statusCode=obj.getcode(),
+                headers={k: v for k, v in obj.getheaders()},
+                body=body
+                if isinstance(body, str)
+                else body.decode("utf8")
+                if isinstance(body, bytes)
+                else None,
+            )
+        )
+        ResponseBuilder.validate(res)
+        return res
+
+    @staticmethod
     def from_dict(obj: Any) -> Response:
         obj_copy = dict(**obj)
 
-        if "bodyAsJson" not in obj_copy:
+        if obj_copy.get("bodyAsJson", None) is None:
             body_as_json = parse_body(obj_copy["body"])
             obj_copy["bodyAsJson"] = body_as_json
 
-        if "timestamp" in obj_copy:
-            obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
-        else:
+        if obj_copy.get("timestamp", None) is None:
             obj_copy["timestamp"] = None
+        else:
+            obj_copy["timestamp"] = parse_iso860_datetime(obj_copy["timestamp"])
 
         res = Response(**obj_copy)
         ResponseBuilder.validate(res)

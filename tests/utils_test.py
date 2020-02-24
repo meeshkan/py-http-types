@@ -4,6 +4,8 @@ from io import StringIO
 from os import path
 import os
 import json
+import httpretty
+from urllib import request
 from http_types import (
     HttpExchange,
     HttpExchangeBuilder,
@@ -179,3 +181,20 @@ def test_example_from_readme():
         assert exchange.request.method == HttpMethod.GET
         assert exchange.request.protocol == Protocol.HTTPS
         assert exchange.response.statusCode == 200
+
+
+@httpretty.activate
+def test_httpbin():
+    httpretty.register_uri(
+        httpretty.GET, "https://httpbin.org/ip", body='{"origin": "127.0.0.1"}'
+    )
+
+    rq = request.Request("https://httpbin.org/ip")
+    rs = request.urlopen(rq)
+    req = RequestBuilder.from_urllib_request(rq)
+    res = ResponseBuilder.from_http_client_response(rs)
+    assert req.protocol == Protocol.HTTPS
+    assert req.method == HttpMethod.GET
+    assert req.path == "/ip"
+    assert res.statusCode == 200
+    assert res.bodyAsJson == {"origin": "127.0.0.1"}
