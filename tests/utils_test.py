@@ -198,3 +198,4 @@ def test_httpbin():
     assert req.path == "/ip"
     assert res.statusCode == 200
     assert res.bodyAsJson == {"origin": "127.0.0.1"}
+    assert isinstance(res.body, str)
