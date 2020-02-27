@@ -34,7 +34,7 @@ DEV = [
     "wheel",
 ]
 
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 
 # Optional packages
 EXTRAS = {"dev": DEV}
