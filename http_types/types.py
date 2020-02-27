@@ -40,7 +40,7 @@ class HttpMethod(enum.Enum):
     CONNECT = "connect"
 
 
-@dataclass
+@dataclass(frozen=True)
 class Request:
     """
     HTTP request.
@@ -99,7 +99,7 @@ class Request:
     body: Optional[str] = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class Response:
     """
     HTTP response.
@@ -127,7 +127,7 @@ class Response:
     bodyAsJson: Optional[Any] = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class HttpExchange:
     """
     HTTP request-response pair.
