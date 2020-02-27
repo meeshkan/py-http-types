@@ -47,21 +47,6 @@ class Request:
     """
 
     """
-    HTTP request body as JSON. Could be dictionary, list, or string.
-    """
-    bodyAsJson: Optional[Any]
-
-    """
-    Timestamp when the request was initiated.
-    """
-    timestamp: Optional[datetime]
-
-    """
-    Request body. None if no body should exit (ie GET, DELETE). Empty string if empty.
-    """
-    body: Optional[str]
-
-    """
     Request method.
     """
     method: HttpMethod
@@ -98,22 +83,27 @@ class Request:
     """
     protocol: Protocol
 
+    """
+    HTTP request body as JSON. Could be dictionary, list, or string.
+    """
+    bodyAsJson: Optional[Any] = None
+
+    """
+    Timestamp when the request was initiated.
+    """
+    timestamp: Optional[datetime] = None
+
+    """
+    Request body. None if no body should exit (ie GET, DELETE). Empty string if empty.
+    """
+    body: Optional[str] = None
+
 
 @dataclass
 class Response:
     """
     HTTP response.
     """
-
-    """
-    Response body as JSON. Could be dictionary, list, or string.
-    """
-    bodyAsJson: Optional[Any]
-
-    """
-    Timestamp when the response was sent.
-    """
-    timestamp: Optional[datetime]
 
     """
     Response body.
@@ -125,6 +115,16 @@ class Response:
 
     """ Response headers. """
     headers: Headers
+
+    """
+    Timestamp when the response was sent.
+    """
+    timestamp: Optional[datetime] = None
+
+    """
+    Response body as JSON. Could be dictionary, list, or string.
+    """
+    bodyAsJson: Optional[Any] = None
 
 
 @dataclass
