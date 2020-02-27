@@ -85,8 +85,8 @@ def parse_qs_flattening(query_string: str) -> Query:
     return query_dict
 
 
-def delete_entries_for_serialization(data_to_be_serialized):
-    """Delete entries that are not to be serialized to JSON."""
+def fixup_entries_for_serialization(data_to_be_serialized):
+    """Fixup entries for JSON serialization"""
     result = (
         asdict(data_to_be_serialized)
         if is_dataclass(data_to_be_serialized)
@@ -96,12 +96,12 @@ def delete_entries_for_serialization(data_to_be_serialized):
     for key, value in to_iter.items():
         if key == "bodyAsJson" or value is None or value == "":
             del result[key]
-        if key == "method":
+        elif key == "method":
             result[key] = result[key].value
-        if key == "protocol":
+        elif key == "protocol":
             result[key] = result[key].value
         elif isinstance(value, dict):
-            result[key] = delete_entries_for_serialization(value)
+            result[key] = fixup_entries_for_serialization(value)
     return result
 
 
@@ -406,6 +406,6 @@ class HttpExchangeWriter:
             exchange: {HttpExchange} -- The exchange to write.
         """
         json.dump(
-            delete_entries_for_serialization(exchange), self.output, default=json_serial
+            fixup_entries_for_serialization(exchange), self.output, default=json_serial
         )
         self.output.write("\n")
