@@ -199,3 +199,10 @@ def test_httpbin():
     assert res.statusCode == 200
     assert res.bodyAsJson == {"origin": "127.0.0.1"}
     assert isinstance(res.body, str)
+
+
+def test_response_from_dict_without_body():
+    response = ResponseBuilder.from_dict(
+        {"statusCode": 200, "headers": {"content-type": "text/plain"}}
+    )
+    assert response.statusCode == 200

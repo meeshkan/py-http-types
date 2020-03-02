@@ -286,6 +286,9 @@ class ResponseBuilder:
     def from_dict(obj: Any) -> Response:
         obj_copy = dict(**obj)
 
+        if obj_copy.get("body", None) is None:
+            obj_copy["body"] = ""
+
         if obj_copy.get("bodyAsJson", None) is None:
             body_as_json = parse_body(obj_copy["body"])
             obj_copy["bodyAsJson"] = body_as_json
