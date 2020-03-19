@@ -5,7 +5,7 @@ from urllib.parse import urlencode, urlparse, parse_qs
 from http.client import HTTPResponse
 from dateutil.parser import isoparse
 import copy
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict
 from http_types.types import (
     HttpMethod,
     Protocol,
@@ -17,6 +17,8 @@ from http_types.types import (
 )
 import re
 from urllib import request
+
+HttpType = Union[HttpExchange, Request, Response]
 
 __all__ = [
     "RequestBuilder",
@@ -85,24 +87,27 @@ def parse_qs_flattening(query_string: str) -> Query:
     return query_dict
 
 
-def fixup_entries_for_serialization(data_to_be_serialized):
+def fixup_entries_for_serialization(data_to_be_serialized: Union[Dict, HttpType]):
     """Fixup entries for JSON serialization"""
-    result = (
-        asdict(data_to_be_serialized)
-        if is_dataclass(data_to_be_serialized)
-        else copy.deepcopy(data_to_be_serialized)
+    as_dict = (
+        data_to_be_serialized
+        if isinstance(data_to_be_serialized, dict)
+        else asdict(data_to_be_serialized)
     )
-    to_iter = copy.deepcopy(result)
+    # Deep copy to avoid mutating nested dictionaries
+    as_dict = copy.deepcopy(as_dict)
+    # Copy for iteration
+    to_iter = copy.deepcopy(as_dict)
     for key, value in to_iter.items():
         if key == "bodyAsJson" or value is None or value == "":
-            del result[key]
+            del as_dict[key]
         elif key == "method":
-            result[key] = result[key].value
+            as_dict[key] = as_dict[key].value
         elif key == "protocol":
-            result[key] = result[key].value
+            as_dict[key] = as_dict[key].value
         elif isinstance(value, dict):
-            result[key] = fixup_entries_for_serialization(value)
-    return result
+            as_dict[key] = fixup_entries_for_serialization(value)
+    return as_dict
 
 
 def parse_iso860_datetime(input_string: str) -> datetime:
@@ -408,7 +413,13 @@ class HttpExchangeWriter:
         Arguments:
             exchange: {HttpExchange} -- The exchange to write.
         """
-        json.dump(
-            fixup_entries_for_serialization(exchange), self.output, default=json_serial
-        )
+        json.dump(self.to_dict(exchange), self.output, default=json_serial)
         self.output.write("\n")
+
+    @staticmethod
+    def to_dict(obj: HttpType) -> dict:
+        return fixup_entries_for_serialization(obj)
+
+    @staticmethod
+    def to_json(obj: HttpType) -> str:
+        return json.dumps(HttpExchangeWriter.to_dict(obj), default=json_serial)
