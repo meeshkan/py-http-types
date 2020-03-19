@@ -15,6 +15,8 @@ from http_types import (
 from dateutil.parser import isoparse
 import jsonschema
 from typeguard import check_type  # type: ignore
+from typing import Sequence
+import pytest
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 SAMPLE_JSON = path.join(dir_path, "resources", "sample.json")
@@ -147,6 +149,35 @@ def test_writing_json():
     exchanges = list(HttpExchangeReader.from_jsonl(buffer))
     validate_sample_exchanges(exchanges)
     assert original_exchanges == exchanges
+
+
+@pytest.fixture
+def exchanges():
+    with open(SAMPLE_JSONL, "r", encoding="utf-8") as f:
+        return [exchange for exchange in HttpExchangeReader.from_jsonl(f)]
+
+
+def test_serializing_to_dict(exchanges: Sequence[HttpExchange]):
+    exchange = exchanges[0]
+    as_dict = HttpExchangeWriter.to_dict(exchange)
+    assert "request" in as_dict
+    assert "response" in as_dict
+    request = as_dict["request"]
+    assert "method" in request
+    assert request["method"] == "get"
+    assert "headers" in request
+    assert "query" in request
+    response = as_dict["response"]
+    assert "body" in response
+    assert isinstance(response["body"], str)
+
+
+def test_serializing_to_json_and_back(exchanges: Sequence[HttpExchange]):
+    exchange = exchanges[0]
+    as_json = HttpExchangeWriter.to_json(exchange)
+    assert isinstance(as_json, str)
+    decoded = HttpExchangeReader.from_json(as_json)
+    assert isinstance(decoded, HttpExchange)
 
 
 def test_example_from_readme():

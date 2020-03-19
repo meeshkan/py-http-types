@@ -13,6 +13,7 @@ pip install http-types
 ```
 
 ## Writing HTTP exchanges
+
 Using `HttpExchangeWriter`a recording of HTTP traffic can be serialised for use with any program that can handle the HTTP Types format:
 
 ```python
@@ -37,9 +38,15 @@ exchange = HttpExchange(request=request, response=response)
 with tempfile.TemporaryFile(mode="w") as output:
     writer = HttpExchangeWriter(output)
     writer.write(exchange)
+
+# Serialize to dictionary
+as_dict = HttpExchangeWriter.to_dict(exchange)
+# Serialize to JSON string
+as_str = HttpExchangeWriter.to_json(exchange)
 ```
 
 ## Reading HTTP exchanges
+
 With `HttpExchangeReader` recordings in the HTTP Types format can be read for processing:
 
 ```python
@@ -50,6 +57,7 @@ for exchange in HttpExchangeReader.from_jsonl(input_file):
 ```
 
 ## Development
+
 Initial setup:
 
 1. Create a new virtual environment.

@@ -5,7 +5,7 @@ from urllib.parse import urlencode, urlparse, parse_qs
 from http.client import HTTPResponse
 from dateutil.parser import isoparse
 import copy
-from dataclasses import asdict, is_dataclass
+from dataclasses import asdict
 from http_types.types import (
     HttpMethod,
     Protocol,
@@ -89,8 +89,11 @@ def parse_qs_flattening(query_string: str) -> Query:
 
 def fixup_entries_for_serialization(data_to_be_serialized: Union[Dict, HttpType]):
     """Fixup entries for JSON serialization"""
-    as_dict = data_to_be_serialized if isinstance(
-        data_to_be_serialized, dict) else asdict(data_to_be_serialized)
+    as_dict = (
+        data_to_be_serialized
+        if isinstance(data_to_be_serialized, dict)
+        else asdict(data_to_be_serialized)
+    )
     # Deep copy to avoid mutating nested dictionaries
     as_dict = copy.deepcopy(as_dict)
     # Copy for iteration
@@ -410,9 +413,7 @@ class HttpExchangeWriter:
         Arguments:
             exchange: {HttpExchange} -- The exchange to write.
         """
-        json.dump(
-            self.to_dict(exchange), self.output, default=json_serial
-        )
+        json.dump(self.to_dict(exchange), self.output, default=json_serial)
         self.output.write("\n")
 
     @staticmethod
