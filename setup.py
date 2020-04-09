@@ -1,4 +1,5 @@
-from setuptools import find_packages, setup, Command, errors
+from distutils import errors
+from setuptools import find_packages, setup, Command
 from shutil import rmtree
 import os
 import sys
@@ -38,7 +39,7 @@ DEV = [
     "wheel",
 ]
 
-VERSION = "0.0.15"
+VERSION = "0.0.16"
 
 # Optional packages
 EXTRAS = {"dev": DEV}
