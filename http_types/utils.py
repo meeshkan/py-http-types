@@ -349,7 +349,8 @@ class HttpExchangeBuilder:
         res_obj = obj["response"]
         res = ResponseBuilder.from_dict(res_obj)
 
-        reqres = HttpExchange(request=req, response=res)
+        reqres = HttpExchange(request=req, response=res, meta=obj["meta"]) if "meta" in obj else HttpExchange(
+            request=req, response=res)
         HttpExchangeBuilder.validate(reqres)
         return reqres
 

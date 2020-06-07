@@ -135,6 +135,7 @@ class HttpExchange:
 
     request: Request
     response: Response
+    meta: Optional[Any] = None
 
 
 __all__ = [
