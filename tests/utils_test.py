@@ -199,3 +199,7 @@ def test_httpbin():
     assert res.statusCode == 200
     assert res.bodyAsJson == {"origin": "127.0.0.1"}
     assert isinstance(res.body, str)
+
+def test_real_data():
+    with open('tests/recordings.jsonl', 'r') as recordings:
+        [HttpExchangeBuilder.from_dict(json.loads(d)) for d in recordings.read().split('\n') if d != '']
