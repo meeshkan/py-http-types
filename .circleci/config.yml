@@ -19,13 +19,6 @@ jobs: # A basic unit of work in a run
             pipenv install -e .[dev] black==19.10b0
             pipenv update
       - run:
-          name: Install pyright
-          command: |
-            set +e
-            echo 'export PATH=$(yarn global bin):$PATH' >> $BASH_ENV
-            source $BASH_ENV
-            yarn global add pyright
-      - run:
           command: |
             export VENV_HOME_DIR=$(pipenv --venv)
             source $VENV_HOME_DIR/bin/activate

@@ -75,7 +75,7 @@ def build():
 
 
 def type_check():
-    return os.system("pyright --lib -p pyrightconfig.json")
+    return os.system("mypy --ignore-missing-imports ./http_types ./tests")
 
 
 class BuildDistCommand(SetupCommand):
@@ -128,7 +128,8 @@ class TestCommand(SetupCommand):
             raise errors.DistutilsError("Type-checking failed.")
 
         self.status("Running flake8...")
-        exit_code = os.system("flake8 --exclude .git,.venv,__pycache__,build,dist")
+        exit_code = os.system(
+            "flake8 --exclude .git,.venv,__pycache__,build,dist")
         if exit_code != 0:
             raise errors.DistutilsError(" failed.")
 
