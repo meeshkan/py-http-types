@@ -27,3 +27,20 @@ def test_request_typechecks():
 
 def test_response_typechecks():
     check_type("res", res, Response)
+
+
+def request_and_response_can_be_instantiated_without_timestamp():
+    request = Request(
+        method=HttpMethod.GET,
+        host="api.github.com",
+        path="/user/repos?id=1",
+        pathname="/user/repos",
+        protocol=Protocol.HTTPS,
+        query={"id": ["1"]},
+        body="",
+        bodyAsJson="",
+        headers={},
+    )
+    assert request.timestamp is None
+    response = Response(statusCode=200, body="OK", bodyAsJson="OK", headers={})
+    assert response.timestamp is None

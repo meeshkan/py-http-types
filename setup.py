@@ -1,4 +1,5 @@
-from setuptools import find_packages, setup, Command, errors
+from distutils import errors
+from setuptools import find_packages, setup, Command
 from shutil import rmtree
 import os
 import sys
@@ -16,7 +17,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = "\n" + f.read()
 
-REQUIRED = ["python-dateutil>=2.8.1", "dataclasses", "typeguard>=2.7.0"]
+REQUIRED = [
+    "python-dateutil>=2.8.1",
+    'dataclasses;python_version<"3.7"',
+    "typeguard>=2.7.0",
+]
 
 DEV = [
     "autopep8",
@@ -34,7 +39,7 @@ DEV = [
     "wheel",
 ]
 
-VERSION = "0.0.10"
+VERSION = "0.0.16"
 
 # Optional packages
 EXTRAS = {"dev": DEV}
