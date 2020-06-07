@@ -95,8 +95,7 @@ def test_from_url_with_root_path():
 def test_from_json():
     with open(SAMPLE_JSON, "r", encoding="utf-8") as f:
         exchange = HttpExchangeReader.from_json(f.read())
-        assert exchange.request.timestamp == isoparse(
-            "2018-11-13T20:20:39+02:00")
+        assert exchange.request.timestamp == isoparse("2018-11-13T20:20:39+02:00")
         assert exchange.response.timestamp == isoparse("2020-01-31T13:34:15")
 
 
@@ -234,9 +233,12 @@ def test_httpbin():
 
 
 def test_real_data():
-    with open('tests/recordings.jsonl', 'r') as recordings:
-        [HttpExchangeBuilder.from_dict(json.loads(d))
-         for d in recordings.read().split('\n') if d != '']
+    with open("tests/recordings.jsonl", "r") as recordings:
+        [
+            HttpExchangeBuilder.from_dict(json.loads(d))
+            for d in recordings.read().split("\n")
+            if d != ""
+        ]
 
 
 def test_response_from_dict_without_body():
