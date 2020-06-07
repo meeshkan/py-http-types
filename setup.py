@@ -28,6 +28,7 @@ DEV = [
     "black",
     "flake8",
     "jsonschema",
+    "mypy",
     "pyhamcrest",
     "pylint",
     "pytest",
@@ -75,7 +76,7 @@ def build():
 
 
 def type_check():
-    return os.system("pyright --lib -p pyrightconfig.json")
+    return os.system("mypy --ignore-missing-imports ./http_types ./tests")
 
 
 class BuildDistCommand(SetupCommand):

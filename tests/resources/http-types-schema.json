@@ -4,19 +4,35 @@
   "type": "object",
   "title": "HttpExchange",
   "description": "A HTTP request and response pair.",
-  "required": [ "request" ],
+  "required": ["request"],
   "properties": {
+    "meta": {
+      "title": "HttpMeta",
+      "description": "A free-form field to store meta-information about a request.",
+      "type": "object",
+      "additionalProperties": true
+    },
     "request": {
       "title": "HttpRequest",
       "description": "A HTTP request.",
       "type": "object",
-      "required": ["protocol", "method", "headers", "host"],
+      "required": ["method"],
       "properties": {
         "method": {
           "title": "HttpMethod",
           "description": "The HTTP method of a request.",
           "type": "string",
-          "enum": ["get", "put", "post", "patch", "delete", "options", "trace", "head", "connect"]
+          "enum": [
+            "get",
+            "put",
+            "post",
+            "patch",
+            "delete",
+            "options",
+            "trace",
+            "head",
+            "connect"
+          ]
         },
         "protocol": {
           "title": "HttpProtocol",
@@ -27,6 +43,11 @@
         "host": {
           "title": "HttpHost",
           "description": "The hostname and optional port, as in '$HOSTNAME[:$PORT]'.",
+          "type": "string"
+        },
+        "url": {
+          "title": "HttpUrl",
+          "description": "The entire, unparsed URL of a request.",
           "type": "string"
         },
         "path": {
@@ -41,20 +62,20 @@
           "type": "object",
           "required": [],
           "additionalProperties": {
-              "anyOf": [
-                { "type": "string" },
-                { "type": "array", "items": { "type": "string" } }
-              ]
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
           }
         },
         "headers": {
           "type": "object",
           "required": [],
           "additionalProperties": {
-              "anyOf": [
-                { "type": "string" },
-                { "type": "array", "items": { "type": "string" } }
-              ]
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
           }
         },
         "body": {
@@ -75,7 +96,7 @@
       "title": "HttpResponse",
       "description": "A HTTP response.",
       "type": "object",
-      "required": [ "statusCode" ],
+      "required": ["statusCode"],
       "properties": {
         "statusCode": {
           "type": "number"
@@ -87,10 +108,10 @@
           "type": "object",
           "required": [],
           "additionalProperties": {
-              "anyOf": [
-                { "type": "string" },
-                { "type": "array", "items": { "type": "string" } }
-              ]
+            "anyOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
           }
         },
         "timestamp": {
