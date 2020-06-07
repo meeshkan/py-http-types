@@ -28,6 +28,7 @@ DEV = [
     "black",
     "flake8",
     "jsonschema",
+    "mypy",
     "pyhamcrest",
     "pylint",
     "pytest",
@@ -128,7 +129,8 @@ class TestCommand(SetupCommand):
             raise errors.DistutilsError("Type-checking failed.")
 
         self.status("Running flake8...")
-        exit_code = os.system("flake8 --exclude .git,.venv,__pycache__,build,dist")
+        exit_code = os.system(
+            "flake8 --exclude .git,.venv,__pycache__,build,dist")
         if exit_code != 0:
             raise errors.DistutilsError(" failed.")
 
