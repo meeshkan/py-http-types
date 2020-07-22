@@ -1,7 +1,12 @@
 node_modules
 /.venv/
 /env/
+/venv/
 .vscode
+.vs
+*.pyproj
+*.pyproj.user
+*.sln
 *.pyc
 .python-version
 .vscode/
