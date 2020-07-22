@@ -1,5 +1,6 @@
 node_modules
-.venv
+/.venv/
+/env/
 .vscode
 *.pyc
 .python-version
