@@ -183,13 +183,15 @@ class RequestBuilder:
             path = obj_copy["path"]
             obj_copy["pathname"] = parse_pathname(path)
 
+        bodyAsJson = obj_copy.get("bodyAsJson", None)
+
         if obj_copy.get("body", None) is None:
-            obj_copy["body"] = ""
+            obj_copy["body"] = json.dumps(bodyAsJson) if bodyAsJson else ""
 
         if obj_copy.get("headers", None) is None:
             obj_copy["headers"] = {}
 
-        if obj_copy.get("bodyAsJson", None) is None:
+        if bodyAsJson is None:
             body_as_json = parse_body(obj_copy["body"])
             obj_copy["bodyAsJson"] = body_as_json
 

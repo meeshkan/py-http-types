@@ -62,6 +62,18 @@ def test_request_from_dict():
     assert req.path == "/v1/users?a=b&q=1&q=2"
 
 
+def test_request_with_bodyAsJson():
+    dict_req = {
+        "host": "example.com",
+        "protocol": "http",
+        "method": "post",
+        "path": "/a/path",
+        "bodyAsJson": {"key": "value"},
+    }
+    req = RequestBuilder.from_dict(dict_req)
+    assert req.body == '{"key": "value"}'
+
+
 def test_validate_protocol():
     assert RequestBuilder.validate_protocol("http") == Protocol.HTTP
     assert RequestBuilder.validate_protocol("https") == Protocol.HTTPS
